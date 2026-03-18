@@ -4,6 +4,7 @@ import Home from "./page";
 const successPayload = {
   marketRound: 12,
   marketStatus: "open",
+  isPartial: false,
   lineup: {
     formation: "4-3-3",
     players: [
@@ -52,7 +53,7 @@ describe("Home", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: /Monte seu time ideal com leitura de app esportivo/i,
+        name: /Monte seu time ideal para a rodada/i,
       }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/Cartoletas disponiveis/i)).toBeInTheDocument();
@@ -105,8 +106,9 @@ describe("Home", () => {
     fireEvent.click(screen.getByRole("button", { name: /Gerar time/i }));
 
     expect((await screen.findAllByText(/Time sugerido para a rodada 12/i)).length).toBeGreaterThan(0);
+    expect(screen.getByTestId("tactical-pitch")).toBeInTheDocument();
     expect(screen.getAllByText(/11 jogadores escalados/i).length).toBeGreaterThan(0);
-    expect(screen.getByText("Pedro")).toBeInTheDocument();
+    expect(screen.getAllByText("Pedro").length).toBeGreaterThan(0);
     expect(screen.getByText("Tite")).toBeInTheDocument();
     expect(screen.getAllByText("PAL em casa").length).toBeGreaterThan(0);
     expect(screen.getByAltText("PAL escudo rival")).toBeInTheDocument();
@@ -116,6 +118,33 @@ describe("Home", () => {
     expect(screen.getByTestId("player-card-5")).toHaveAttribute("data-team-color-source", "mapped");
     expect(screen.getByText(/matches: missing matchup for club 40/i)).toBeInTheDocument();
     expect(screen.getByText(/Time otimizado para maximizar o score total/i)).toBeInTheDocument();
+  });
+
+  it("opens and closes the player analysis modal", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => successPayload,
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<Home />);
+
+    fireEvent.click(screen.getByRole("button", { name: /Gerar time/i }));
+
+    const playerTriggers = await screen.findAllByRole("button", { name: /Abrir analise de Pedro/i });
+    fireEvent.click(playerTriggers[0]);
+
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toBeInTheDocument();
+    expect(within(dialog).getByRole("heading", { name: "Pedro" })).toBeInTheDocument();
+    expect(within(dialog).getByText(/Justificativa/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /Fechar analise/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
   });
 
   it("uses fallback team tint when club abbreviation is not mapped", async () => {

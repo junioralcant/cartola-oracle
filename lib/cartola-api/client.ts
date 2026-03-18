@@ -15,6 +15,7 @@ import {
 } from "./types";
 
 const API_BASE_URL = "https://api.cartola.globo.com";
+const ELIGIBLE_ATHLETE_STATUS_ID = 7;
 
 export interface HttpCartolaApiClientOptions {
   baseUrl?: string;
@@ -284,6 +285,7 @@ const normalizeMarketAthletes = (payload: unknown): ApiResult<NormalizedMarketAt
   const warnings: CartolaApiWarning[] = [];
   const athletes: NormalizedAthlete[] = [];
   const coachesById = new Map<number, NormalizedCoach>();
+  const excludedByStatus = new Map<string, number>();
 
   if (Array.isArray(payload.tecnicos)) {
     for (const rawCoach of payload.tecnicos) {
@@ -309,6 +311,12 @@ const normalizeMarketAthletes = (payload: unknown): ApiResult<NormalizedMarketAt
       continue;
     }
 
+    if (normalized.statusId !== ELIGIBLE_ATHLETE_STATUS_ID) {
+      const statusKey = normalized.statusId === null ? "unknown" : String(normalized.statusId);
+      excludedByStatus.set(statusKey, (excludedByStatus.get(statusKey) ?? 0) + 1);
+      continue;
+    }
+
     if (normalized.positionId === 6) {
       const derivedCoach = coachFromAthlete(normalized);
       if (!coachesById.has(derivedCoach.id)) {
@@ -318,6 +326,18 @@ const normalizeMarketAthletes = (payload: unknown): ApiResult<NormalizedMarketAt
     }
 
     athletes.push(normalized);
+  }
+
+  if (excludedByStatus.size > 0) {
+    const excludedTotal = Array.from(excludedByStatus.values()).reduce((sum, current) => sum + current, 0);
+    const breakdown = Array.from(excludedByStatus.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([status, count]) => `${status}:${count}`)
+      .join(", ");
+    warnings.push({
+      endpoint: "market-athletes",
+      message: `Filtered ${excludedTotal} athletes by ineligible status_id (${breakdown}); only status_id=7 is accepted`,
+    });
   }
 
   if (athletes.length === 0) {
@@ -350,6 +370,7 @@ const normalizeAthlete = (value: unknown): NormalizedAthlete | null => {
 
   const id = asNumber(value.atleta_id);
   const name = asString(value.apelido);
+  const statusId = asNumber(value.status_id);
   const positionId = asNumber(value.posicao_id);
   const clubId = asNumber(value.clube_id);
   const price = asNumber(value.preco_num);
@@ -371,6 +392,7 @@ const normalizeAthlete = (value: unknown): NormalizedAthlete | null => {
   return {
     id,
     name,
+    statusId,
     positionId,
     clubId,
     price,

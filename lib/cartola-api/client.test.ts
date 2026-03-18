@@ -134,6 +134,7 @@ describe("HttpCartolaApiClient", () => {
           {
             atleta_id: 1,
             apelido: "Pedro",
+            status_id: 7,
             posicao_id: 5,
             clube_id: 10,
             preco_num: 12.5,
@@ -186,6 +187,7 @@ describe("HttpCartolaApiClient", () => {
           {
             atleta_id: 1,
             apelido: "Goleiro",
+            status_id: 7,
             posicao_id: 1,
             clube_id: 10,
             preco_num: 12.5,
@@ -196,6 +198,7 @@ describe("HttpCartolaApiClient", () => {
           {
             atleta_id: 50,
             apelido: "Plug Técnico",
+            status_id: 7,
             posicao_id: 6,
             clube_id: 10,
             preco_num: 5,
@@ -227,6 +230,7 @@ describe("HttpCartolaApiClient", () => {
           {
             atleta_id: 1,
             apelido: "Defensor",
+            status_id: 7,
             posicao_id: 3,
             clube_id: 20,
             preco_num: 9.5,
@@ -236,6 +240,7 @@ describe("HttpCartolaApiClient", () => {
           {
             atleta_id: 99,
             apelido: "Técnico Legacy",
+            status_id: 7,
             posicao_id: 6,
             clube_id: 20,
             preco_num: 3,
@@ -265,5 +270,54 @@ describe("HttpCartolaApiClient", () => {
 
     expect(result.data.coaches).toHaveLength(1);
     expect(result.data.coaches[0].price).toBe(4);
+  });
+
+  it("filters out athletes with ineligible status_id", async () => {
+    const fetchFn = vi.fn().mockResolvedValue(
+      okResponse({
+        atletas: [
+          {
+            atleta_id: 1,
+            apelido: "Provavel",
+            status_id: 7,
+            posicao_id: 5,
+            clube_id: 10,
+            preco_num: 12.5,
+            media_num: 6.3,
+            pontos_num: 8.2,
+          },
+          {
+            atleta_id: 2,
+            apelido: "Duvida",
+            status_id: 2,
+            posicao_id: 5,
+            clube_id: 10,
+            preco_num: 9.1,
+            media_num: 4.4,
+            pontos_num: 5.2,
+          },
+        ],
+        clubes: {
+          "10": {
+            nome: "Flamengo",
+            abreviacao: "FLA",
+          },
+        },
+      }),
+    );
+
+    const client = new HttpCartolaApiClient({ fetchFn });
+    const result = await client.getMarketAthletes();
+
+    expect(result.data.athletes).toHaveLength(1);
+    expect(result.data.athletes[0].name).toBe("Provavel");
+    expect(result.warnings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          endpoint: "market-athletes",
+          message: expect.stringContaining("only status_id=7 is accepted"),
+        }),
+      ]),
+    );
   });
 });

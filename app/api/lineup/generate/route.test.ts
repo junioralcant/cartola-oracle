@@ -92,6 +92,7 @@ describe("POST /api/lineup/generate", () => {
     const payload = await response.json();
 
     expect(response.status).toBe(200);
+    expect(payload.isPartial).toBe(false);
     expect(payload.summary).toEqual({
       formation: "4-3-3",
       totalCost: 118.3,
@@ -120,27 +121,42 @@ describe("POST /api/lineup/generate", () => {
     });
   });
 
-  it("returns 422 when lineup is not possible and keeps context warnings", async () => {
+  it("returns 200 with partial lineup when full lineup is not possible", async () => {
     mockAssertGenerateLineupRequest.mockImplementation(() => undefined);
     mockBuildRoundContext.mockResolvedValue({
       marketRound: 5,
       marketStatus: "open",
       lastRound: 4,
-      players: [],
-      coaches: [],
+      players: [
+        { id: 1, name: "Goleiro", position: "GOL", clubId: 10, clubAbbreviation: "FLA", opponentClubAbbreviation: "INT", isHome: true, price: 9, score: 7.1, justification: "Bom momento." },
+        { id: 2, name: "Lateral", position: "LAT", clubId: 10, clubAbbreviation: "FLA", opponentClubAbbreviation: "INT", isHome: true, price: 8, score: 6.5, justification: "Regular." },
+      ],
+      coaches: [{ id: 99, name: "Tecnico", clubId: 10, clubAbbreviation: "FLA", price: 6, score: 5.8, justification: "Confronto ok." }],
       warnings: ["clubs: missing data for club 20"],
     });
-    mockScoreRoundContext.mockReturnValue({ players: [], coaches: [] });
+    mockScoreRoundContext.mockReturnValue({
+      players: [
+        { id: 1, name: "Goleiro", position: "GOL", clubId: 10, clubAbbreviation: "FLA", opponentClubAbbreviation: "INT", isHome: true, price: 9, score: 7.1, justification: "Bom momento." },
+        { id: 2, name: "Lateral", position: "LAT", clubId: 10, clubAbbreviation: "FLA", opponentClubAbbreviation: "INT", isHome: true, price: 8, score: 6.5, justification: "Regular." },
+      ],
+      coaches: [{ id: 99, name: "Tecnico", clubId: 10, clubAbbreviation: "FLA", price: 6, score: 5.8, justification: "Confronto ok." }],
+    });
     mockGenerateLineup.mockImplementation(() => {
       throw new MockLineupNotPossibleError("Nao foi possivel montar um time valido com esse orcamento e formacao.");
     });
 
-    const response = await POST(createRequest({ budget: 10, formation: "4-3-3" }));
+    const response = await POST(createRequest({ budget: 40, formation: "4-3-3" }));
     const payload = await response.json();
 
-    expect(response.status).toBe(422);
-    expect(payload.error.code).toBe("LINEUP_NOT_POSSIBLE");
-    expect(payload.warnings).toEqual(["clubs: missing data for club 20"]);
+    expect(response.status).toBe(200);
+    expect(payload.isPartial).toBe(true);
+    expect(payload.lineup.players).toHaveLength(2);
+    expect(payload.warnings).toEqual(
+      expect.arrayContaining([
+        "clubs: missing data for club 20",
+        expect.stringContaining("lineup-partial:"),
+      ]),
+    );
   });
 
   it("returns 503 for technical failures", async () => {

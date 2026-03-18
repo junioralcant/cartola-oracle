@@ -1,0 +1,726 @@
+{
+  "source": {
+    "tool": "paper.design",
+    "paper_url": "https://app.paper.design/file/01KKZ1YCZNDG8FCMMR3PPH763K",
+    "file_id": "01KKZ1YCZNDG8FCMMR3PPH763K",
+    "file_name": "Scratchpad",
+    "page_name": "Page 1",
+    "artboards": [
+      "Cartola Oracle - Home",
+      "Cartola Oracle - Resultado",
+      "Cartola Oracle - Modal"
+    ],
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "platform": "mobile"
+    },
+    "extracted_at": "2026-03-18"
+  },
+  "llm_task": {
+    "objective": "Extrair sistema de tipografia, tokens de cor e espacamentos do design para alimentar outra LLM.",
+    "output_language": "pt-BR",
+    "normalization_rules": [
+      "Normalizar cores equivalentes em tokens semanticos reutilizaveis.",
+      "Separar tokens globais de padroes especificos de componentes.",
+      "Converter medidas recorrentes em uma escala de spacing.",
+      "Preservar valores originais quando houver opacidade relevante.",
+      "Identificar familia, peso, tamanho, line-height, letter-spacing e uso semantico da tipografia."
+    ]
+  },
+  "design_tokens": {
+    "fonts": {
+      "families": [
+        {
+          "token": "font.family.display",
+          "value": "Sora",
+          "usage": [
+            "modal title",
+            "modal player name",
+            "modal stats",
+            "modal CTA"
+          ]
+        },
+        {
+          "token": "font.family.brand",
+          "value": "Space Grotesk",
+          "usage": [
+            "brand eyebrow",
+            "uppercase label"
+          ]
+        },
+        {
+          "token": "font.family.ui",
+          "value": "system-ui, sans-serif",
+          "usage": [
+            "body text",
+            "cards",
+            "labels",
+            "navigation",
+            "hero copy"
+          ]
+        }
+      ],
+      "sizes": [
+        {
+          "token": "font.size.xs",
+          "value": 11,
+          "unit": "px"
+        },
+        {
+          "token": "font.size.sm",
+          "value": 12,
+          "unit": "px"
+        },
+        {
+          "token": "font.size.md",
+          "value": 13,
+          "unit": "px"
+        },
+        {
+          "token": "font.size.base",
+          "value": 14,
+          "unit": "px"
+        },
+        {
+          "token": "font.size.lg",
+          "value": 16,
+          "unit": "px"
+        },
+        {
+          "token": "font.size.xl",
+          "value": 19,
+          "unit": "px"
+        },
+        {
+          "token": "font.size.2xl",
+          "value": 20,
+          "unit": "px"
+        },
+        {
+          "token": "font.size.3xl",
+          "value": 22,
+          "unit": "px"
+        },
+        {
+          "token": "font.size.4xl",
+          "value": 24,
+          "unit": "px"
+        },
+        {
+          "token": "font.size.5xl",
+          "value": 28,
+          "unit": "px"
+        },
+        {
+          "token": "font.size.6xl",
+          "value": 32,
+          "unit": "px"
+        }
+      ],
+      "weights": [
+        {
+          "token": "font.weight.regular",
+          "value": 400
+        },
+        {
+          "token": "font.weight.bold",
+          "value": 700
+        },
+        {
+          "token": "font.weight.extrabold",
+          "value": 800
+        }
+      ],
+      "line_heights": [
+        {
+          "token": "font.line.xs",
+          "value": 14,
+          "unit": "px"
+        },
+        {
+          "token": "font.line.sm",
+          "value": 16,
+          "unit": "px"
+        },
+        {
+          "token": "font.line.md",
+          "value": 18,
+          "unit": "px"
+        },
+        {
+          "token": "font.line.lg",
+          "value": 20,
+          "unit": "px"
+        },
+        {
+          "token": "font.line.xl",
+          "value": 24,
+          "unit": "px"
+        },
+        {
+          "token": "font.line.2xl",
+          "value": 30,
+          "unit": "px"
+        },
+        {
+          "token": "font.line.3xl",
+          "value": 34,
+          "unit": "px"
+        }
+      ],
+      "letter_spacing": [
+        {
+          "token": "font.tracking.tight",
+          "value": "0.02em"
+        },
+        {
+          "token": "font.tracking.wide",
+          "value": "0.08em"
+        },
+        {
+          "token": "font.tracking.ultra",
+          "value": "0.18em"
+        }
+      ],
+      "semantic_roles": [
+        {
+          "role": "hero_eyebrow",
+          "family": "Space Grotesk",
+          "size": 12,
+          "weight": 400,
+          "line_height": 16,
+          "letter_spacing": "0.18em",
+          "transform": "uppercase"
+        },
+        {
+          "role": "hero_title",
+          "family": "system-ui, sans-serif",
+          "size": 32,
+          "weight": 400,
+          "line_height": 34,
+          "color_token": "color.text.primary"
+        },
+        {
+          "role": "hero_body",
+          "family": "system-ui, sans-serif",
+          "size": 14,
+          "weight": 400,
+          "line_height": 21,
+          "color_token": "color.text.secondary"
+        },
+        {
+          "role": "card_title",
+          "family": "system-ui, sans-serif",
+          "size": 22,
+          "weight": 400,
+          "line_height": 25,
+          "color_token": "color.text.primary"
+        },
+        {
+          "role": "button_label",
+          "family": "system-ui, sans-serif",
+          "size": 16,
+          "weight": 700,
+          "line_height": 20,
+          "color_token": "color.text.primary"
+        },
+        {
+          "role": "modal_heading",
+          "family": "Sora",
+          "size": 28,
+          "weight": 700,
+          "line_height": 34,
+          "color_token": "color.text.primary"
+        },
+        {
+          "role": "modal_player_name",
+          "family": "Sora",
+          "size": 24,
+          "weight": 700,
+          "line_height": 30,
+          "color_token": "color.text.primary"
+        },
+        {
+          "role": "metric_value",
+          "family": "Sora",
+          "size": 24,
+          "weight": 700,
+          "line_height": 30,
+          "color_token": "color.text.primary"
+        }
+      ]
+    },
+    "colors": {
+      "base": [
+        {
+          "token": "color.bg.canvas.start",
+          "value": "#181421"
+        },
+        {
+          "token": "color.bg.canvas.mid",
+          "value": "#211C2E"
+        },
+        {
+          "token": "color.bg.canvas.end",
+          "value": "#262033"
+        },
+        {
+          "token": "color.bg.surface",
+          "value": "#FFFFFF0D"
+        },
+        {
+          "token": "color.bg.surface.strong",
+          "value": "#FFFFFF0F"
+        },
+        {
+          "token": "color.bg.surface.alt",
+          "value": "#634AFF24"
+        },
+        {
+          "token": "color.bg.overlay",
+          "value": "#141222C7"
+        },
+        {
+          "token": "color.border.subtle",
+          "value": "#FFFFFF14"
+        },
+        {
+          "token": "color.border.soft",
+          "value": "#FFFFFF24"
+        },
+        {
+          "token": "color.text.primary",
+          "value": "#FFFFFF"
+        },
+        {
+          "token": "color.text.secondary",
+          "value": "#EEEAFFB8"
+        },
+        {
+          "token": "color.text.muted",
+          "value": "#FFFFFF99"
+        },
+        {
+          "token": "color.text.tertiary",
+          "value": "#FFFFFF85"
+        },
+        {
+          "token": "color.text.inverse_soft",
+          "value": "#F7F5FF"
+        },
+        {
+          "token": "color.brand.primary",
+          "value": "#A791FF"
+        },
+        {
+          "token": "color.brand.secondary",
+          "value": "#C5B8FF"
+        },
+        {
+          "token": "color.brand.accent",
+          "value": "#6F4DFF"
+        },
+        {
+          "token": "color.success",
+          "value": "#8DF8C7"
+        },
+        {
+          "token": "color.warning",
+          "value": "#FFCF66"
+        },
+        {
+          "token": "color.danger",
+          "value": "#B91C1C"
+        }
+      ],
+      "gradients": [
+        {
+          "token": "gradient.canvas.primary",
+          "value": "linear-gradient(180deg, #181421 0%, #211C2E 45%, #262033 100%)"
+        },
+        {
+          "token": "gradient.button.primary",
+          "value": "linear-gradient(90deg, #6F4DFF 0%, #8D79FF 100%)"
+        },
+        {
+          "token": "gradient.card.glass",
+          "value": "linear-gradient(180deg, rgba(50,45,70,0.92) 0%, rgba(58,53,80,0.90) 100%)"
+        },
+        {
+          "token": "gradient.card.analytics",
+          "value": "linear-gradient(180deg, rgba(70,55,110,0.82) 0%, rgba(50,40,90,0.92) 100%)"
+        },
+        {
+          "token": "gradient.highlight.green",
+          "value": "linear-gradient(180deg, rgba(70,95,80,0.92) 0%, rgba(45,70,60,0.90) 100%)"
+        }
+      ],
+      "semantic_mapping": [
+        {
+          "role": "primary_cta",
+          "background": "gradient.button.primary",
+          "text": "color.text.primary",
+          "shadow_hint": "#5D3DFF57"
+        },
+        {
+          "role": "glass_card",
+          "background": "gradient.card.glass",
+          "border": "color.border.subtle",
+          "text": "color.text.primary"
+        },
+        {
+          "role": "success_label",
+          "text": "color.success"
+        },
+        {
+          "role": "warning_metric",
+          "text": "color.warning"
+        },
+        {
+          "role": "brand_badge",
+          "background": "color.bg.surface.alt",
+          "text": "color.brand.secondary"
+        }
+      ]
+    },
+    "spacing": {
+      "scale": [
+        {
+          "token": "space.1",
+          "value": 4,
+          "unit": "px"
+        },
+        {
+          "token": "space.1_5",
+          "value": 6,
+          "unit": "px"
+        },
+        {
+          "token": "space.2",
+          "value": 8,
+          "unit": "px"
+        },
+        {
+          "token": "space.2_5",
+          "value": 10,
+          "unit": "px"
+        },
+        {
+          "token": "space.3",
+          "value": 12,
+          "unit": "px"
+        },
+        {
+          "token": "space.3_5",
+          "value": 14,
+          "unit": "px"
+        },
+        {
+          "token": "space.4",
+          "value": 16,
+          "unit": "px"
+        },
+        {
+          "token": "space.4_5",
+          "value": 18,
+          "unit": "px"
+        },
+        {
+          "token": "space.5",
+          "value": 20,
+          "unit": "px"
+        },
+        {
+          "token": "space.5_5",
+          "value": 22,
+          "unit": "px"
+        },
+        {
+          "token": "space.6",
+          "value": 24,
+          "unit": "px"
+        },
+        {
+          "token": "space.7_5",
+          "value": 30,
+          "unit": "px"
+        },
+        {
+          "token": "space.8",
+          "value": 32,
+          "unit": "px"
+        }
+      ],
+      "layout": {
+        "screen_padding_x": 24,
+        "status_bar_padding_x": 24,
+        "hero_gap_y": 18,
+        "section_gap_y": 18,
+        "card_internal_padding": 20,
+        "modal_card_padding": 22,
+        "input_chip_gap": 8,
+        "card_pair_gap": 10,
+        "nav_padding_x": 12,
+        "nav_item_height": 54,
+        "bottom_nav_height": 74,
+        "cta_height.home": 58,
+        "cta_height.modal": 54
+      },
+      "component_patterns": [
+        {
+          "component": "hero",
+          "outer_padding_x": 24,
+          "outer_padding_top": 18,
+          "stack_gap": 18,
+          "text_stack_gap": 8,
+          "stats_card_gap": 10
+        },
+        {
+          "component": "glass_card",
+          "padding_x": 20,
+          "padding_y": 20,
+          "section_gap": 16,
+          "inner_row_gap": 10
+        },
+        {
+          "component": "metric_card",
+          "padding_x": 14,
+          "padding_y": 14,
+          "content_gap": 4
+        },
+        {
+          "component": "chip",
+          "padding_x": 10,
+          "padding_y": 7,
+          "chip_gap": 8
+        },
+        {
+          "component": "info_strip_card",
+          "padding_x": 16,
+          "padding_y": 16,
+          "content_gap": 8
+        },
+        {
+          "component": "bottom_nav",
+          "outer_margin_x": 24,
+          "outer_margin_top": 24,
+          "inner_padding_x": 12,
+          "inner_padding_y": 10
+        }
+      ]
+    },
+    "radius": {
+      "tokens": [
+        {
+          "token": "radius.sm",
+          "value": 14,
+          "unit": "px"
+        },
+        {
+          "token": "radius.md",
+          "value": 16,
+          "unit": "px"
+        },
+        {
+          "token": "radius.lg",
+          "value": 18,
+          "unit": "px"
+        },
+        {
+          "token": "radius.xl",
+          "value": 20,
+          "unit": "px"
+        },
+        {
+          "token": "radius.2xl",
+          "value": 22,
+          "unit": "px"
+        },
+        {
+          "token": "radius.3xl",
+          "value": 24,
+          "unit": "px"
+        },
+        {
+          "token": "radius.4xl",
+          "value": 28,
+          "unit": "px"
+        },
+        {
+          "token": "radius.5xl",
+          "value": 30,
+          "unit": "px"
+        },
+        {
+          "token": "radius.6xl",
+          "value": 32,
+          "unit": "px"
+        },
+        {
+          "token": "radius.full",
+          "value": 999,
+          "unit": "px"
+        }
+      ]
+    },
+    "shadows": {
+      "tokens": [
+        {
+          "token": "shadow.card",
+          "value": "0 20px 40px rgba(0,0,0,0.34)"
+        },
+        {
+          "token": "shadow.cta",
+          "value": "0 14px 30px rgba(93,61,255,0.34)"
+        },
+        {
+          "token": "shadow.modal",
+          "value": "0 34px 60px rgba(0,0,0,0.48)"
+        },
+        {
+          "token": "shadow.icon_ring",
+          "value": "0 0 0 6px rgba(111,77,255,0.14)"
+        }
+      ]
+    }
+  },
+  "extraction_schema": {
+    "type": "object",
+    "properties": {
+      "fonts": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string"
+            },
+            "family": {
+              "type": "string"
+            },
+            "size": {
+              "type": "number"
+            },
+            "weight": {
+              "type": "number"
+            },
+            "line_height": {
+              "type": "number"
+            },
+            "letter_spacing": {
+              "type": "string"
+            },
+            "text_transform": {
+              "type": "string"
+            },
+            "usage": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "token",
+            "family",
+            "size",
+            "usage"
+          ]
+        }
+      },
+      "color_tokens": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "usage": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "token",
+            "value",
+            "type"
+          ]
+        }
+      },
+      "spacing_tokens": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string"
+            },
+            "value": {
+              "type": "number"
+            },
+            "unit": {
+              "type": "string"
+            },
+            "usage": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "token",
+            "value",
+            "unit"
+          ]
+        }
+      },
+      "component_spacing": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "component": {
+              "type": "string"
+            },
+            "padding_x": {
+              "type": "number"
+            },
+            "padding_y": {
+              "type": "number"
+            },
+            "gap": {
+              "type": "number"
+            },
+            "margin_top": {
+              "type": "number"
+            },
+            "margin_bottom": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "component"
+          ]
+        }
+      }
+    },
+    "required": [
+      "fonts",
+      "color_tokens",
+      "spacing_tokens",
+      "component_spacing"
+    ]
+  },
+  "llm_prompt_hint": {
+    "instruction": "Extraia apenas padroes recorrentes. Se houver variacoes isoladas, classifique-as como excecao e nao como token global.",
+    "priorities": [
+      "Identificar familias tipograficas principais",
+      "Agrupar cores por semantica",
+      "Mapear escala de spacing dominante",
+      "Distinguir spacing estrutural de padding interno",
+      "Relacionar tokens a componentes reais"
+    ]
+  }
+}

@@ -1,0 +1,527 @@
+{
+  "source": {
+    "paper_url": "https://app.paper.design/file/01KKZ1YCZNDG8FCMMR3PPH763K",
+    "extracted_via": "Paper MCP",
+    "extracted_at": "2026-03-18",
+    "notes": [
+      "Arquivo Paper identificado como 'Scratchpad' / 'Page 1'.",
+      "Estrutura baseada nas 3 artboards encontradas no arquivo.",
+      "JSON otimizado para consumo por LLM, priorizando texto visivel, hierarquia, semantica e sinais de estilo."
+    ]
+  },
+  "file": {
+    "name": "Scratchpad",
+    "page_name": "Page 1",
+    "page_id": "01KKZ1YCZNE0DH14SEGPRYM6CD",
+    "root_node_id": "root_node_01KKZ1YCZNE0DH14SEGPRYM6CD",
+    "node_count": 248,
+    "artboard_count": 3,
+    "font_families": [
+      "System Sans-Serif",
+      "Space Grotesk",
+      "Sora"
+    ]
+  },
+  "design_system": {
+    "platform": "mobile",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "corner_radius": 36
+    },
+    "theme": {
+      "mood": [
+        "futurista",
+        "analitico",
+        "esportivo",
+        "premium",
+        "dark glassmorphism"
+      ],
+      "backgrounds": [
+        "gradientes escuros em tons de roxo, azul e cinza",
+        "glows radiais violeta, verde e dourado",
+        "cards semitransparentes com bordas sutis"
+      ],
+      "primary_colors": {
+        "text_primary": "#FFFFFF",
+        "text_secondary": "#FFFFFF8A",
+        "accent_purple": "#6F4DFF",
+        "accent_green": "#8DF8C7",
+        "accent_gold": "#FFCF66"
+      },
+      "typography": {
+        "brand_label": "Space Grotesk",
+        "ui_and_cards": "Sora / system-ui",
+        "hero_title_size_range": "28px-32px",
+        "body_size_range": "12px-16px"
+      },
+      "visual_patterns": [
+        "cards com border radius entre 20px e 32px",
+        "gradiente horizontal roxo no CTA principal",
+        "chips e metricas com opacidade baixa sobre fundo escuro",
+        "tela de modal com backdrop blur e sobreposicao escura"
+      ]
+    }
+  },
+  "artboards": [
+    {
+      "id": "4-1",
+      "name": "Cartola Oracle - Home",
+      "size": {
+        "width": 390,
+        "height": 844
+      },
+      "purpose": "Tela inicial para configurar e gerar a melhor escalacao da rodada.",
+      "background": {
+        "type": "dark gradient",
+        "base_gradient": "linear-gradient vertical escuro",
+        "decorative_glows": [
+          {
+            "color_family": "purple",
+            "size": "220x220",
+            "position": "top-right"
+          },
+          {
+            "color_family": "green",
+            "size": "220x220",
+            "position": "mid-left"
+          },
+          {
+            "color_family": "gold",
+            "size": "190x190",
+            "position": "bottom-right"
+          }
+        ]
+      },
+      "status_bar": {
+        "time": "9:30 PM",
+        "icons": [
+          "battery outline",
+          "signal/indicator pill"
+        ]
+      },
+      "sections": [
+        {
+          "type": "hero",
+          "brand": "Cartola Oracle",
+          "title": "Escalação inteligente para a rodada.",
+          "description": "Gere uma escalação otimizada com leitura rápida de orçamento, formação e valor esperado.",
+          "side_badge": {
+            "shape": "circular glass button",
+            "label": "O"
+          }
+        },
+        {
+          "type": "summary_cards",
+          "items": [
+            {
+              "card": "rodada",
+              "value": "28",
+              "status": "mercado aberto",
+              "style": "card roxo com glow"
+            },
+            {
+              "card": "resumo_rapido",
+              "badge": "atualizado",
+              "metrics": [
+                {
+                  "label": "score proj.",
+                  "value": "82.4"
+                },
+                {
+                  "label": "valor médio",
+                  "value": "C$ 11.1"
+                }
+              ],
+              "style": "card escuro translúcido"
+            }
+          ]
+        },
+        {
+          "type": "generate_team_card",
+          "label": "Gerar escalação",
+          "title": "Defina orçamento e formação.",
+          "status": "API ready",
+          "inputs": [
+            {
+              "label": "Orçamento",
+              "value": "C$ 120.00"
+            },
+            {
+              "label": "Formação",
+              "value": "4-3-3",
+              "style": "selecionado / highlight roxo"
+            }
+          ],
+          "chips": [
+            "120 cartoletas",
+            "4-3-3"
+          ],
+          "primary_cta": "Gerar melhor time"
+        },
+        {
+          "type": "preview_strip",
+          "title": "O que entra no resultado",
+          "meta": "mock / api",
+          "cards": [
+            {
+              "title": "Campo tático",
+              "description": "11 atletas distribuídos por formação",
+              "footer": "score por posição",
+              "accent": "green"
+            },
+            {
+              "title": "Modal analítico",
+              "description": "Média, scout, custo e justificativa expandida",
+              "footer": "tap para abrir",
+              "accent": "purple"
+            }
+          ]
+        },
+        {
+          "type": "bottom_nav",
+          "items": [
+            {
+              "label": "Home",
+              "active": true
+            },
+            {
+              "label": "Resultados",
+              "active": false
+            },
+            {
+              "label": "Análise",
+              "active": false
+            },
+            {
+              "label": "Perfil",
+              "active": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5-1",
+      "name": "Cartola Oracle - Resultado",
+      "size": {
+        "width": 390,
+        "height": 844
+      },
+      "purpose": "Tela de resultado da escalacao com campo tatico, custo, saldo, tecnico e cards resumidos.",
+      "background": {
+        "type": "dark gradient",
+        "decorative_glows": [
+          {
+            "color_family": "purple",
+            "size": "220x220",
+            "position": "top-right"
+          },
+          {
+            "color_family": "green",
+            "size": "200x200",
+            "position": "mid-left"
+          }
+        ]
+      },
+      "header": {
+        "time": "9:30 PM",
+        "brand": "Cartola Oracle",
+        "title": "Resultado da escalação",
+        "subtitle": "4-3-3 • rodada 28 • projeção em tempo real",
+        "round_badge": "28"
+      },
+      "top_metrics": [
+        {
+          "label": "Custo total",
+          "value": "C$ 118.44"
+        },
+        {
+          "label": "Saldo",
+          "value": "C$ 1.56",
+          "accent": "green"
+        }
+      ],
+      "pitch_card": {
+        "label": "Componente formação",
+        "title": "Escalação do usuário",
+        "score_badge": "82.4 pts",
+        "formation_tabs": [
+          {
+            "label": "4-3-3",
+            "active": true
+          },
+          {
+            "label": "3-4-3",
+            "active": false
+          },
+          {
+            "label": "4-4-2",
+            "active": false
+          }
+        ],
+        "field": {
+          "style": "card verde-escuro com linhas de campo e circulo central",
+          "formation": "4-3-3",
+          "players": [
+            {
+              "position_group": "ATA",
+              "club": "BAH",
+              "name": "Erick",
+              "score": 8.8,
+              "position_hint": "top-left"
+            },
+            {
+              "position_group": "ATA",
+              "club": "FLA",
+              "name": "Pedro",
+              "score": 10.4,
+              "position_hint": "top-center",
+              "highlighted": true
+            },
+            {
+              "position_group": "ATA",
+              "club": "VAS",
+              "name": "Vegetti",
+              "score": 9.0,
+              "position_hint": "top-right"
+            },
+            {
+              "position_group": "MEI",
+              "club": "FLU",
+              "name": "Ganso",
+              "score": 8.1,
+              "position_hint": "mid-left"
+            },
+            {
+              "position_group": "MEI",
+              "club": "FLA",
+              "name": "De La Cruz",
+              "score": 9.2,
+              "position_hint": "mid-center"
+            },
+            {
+              "position_group": "MEI",
+              "club": "GRE",
+              "name": "Alan P.",
+              "score": 7.7,
+              "position_hint": "mid-right"
+            },
+            {
+              "position_group": "DEF",
+              "club": "PAL",
+              "name": "Ayrton",
+              "score": 6.8,
+              "position_hint": "lower-left-wide"
+            },
+            {
+              "position_group": "DEF",
+              "club": "PAL",
+              "name": "Gomez",
+              "score": 7.9,
+              "position_hint": "lower-left-center"
+            },
+            {
+              "position_group": "DEF",
+              "club": "PAL",
+              "name": "Murilo",
+              "score": 7.5,
+              "position_hint": "lower-right-center"
+            },
+            {
+              "position_group": "DEF",
+              "club": "FLU",
+              "name": "Arias",
+              "score": 6.6,
+              "position_hint": "lower-right-wide"
+            },
+            {
+              "position_group": "GOL",
+              "club": "CAP",
+              "name": "Bento",
+              "score": 7.4,
+              "position_hint": "bottom-center"
+            }
+          ]
+        }
+      },
+      "coach_card": {
+        "role": "Técnico",
+        "name": "Tite Costa",
+        "meta": "média 6.4 • custo C$ 8.32",
+        "projection_label": "projeção",
+        "projection_value": 7.1
+      },
+      "selected_strip": {
+        "title": "Atletas selecionados",
+        "meta": "12 cards",
+        "cards": [
+          {
+            "position": "ATA",
+            "name": "Pedro",
+            "score": "10.4 pts"
+          },
+          {
+            "position": "MEI",
+            "name": "D. Cruz",
+            "score": "9.2 pts"
+          },
+          {
+            "position": "ZAG",
+            "name": "Gomez",
+            "score": "7.9 pts"
+          }
+        ]
+      }
+    },
+    {
+      "id": "6-1",
+      "name": "Cartola Oracle - Modal",
+      "size": {
+        "width": 390,
+        "height": 844
+      },
+      "purpose": "Modal detalhado de atleta, exibido sobre a tela de lineup.",
+      "background_layer": {
+        "overlay": "dark translucent overlay",
+        "blurred_underlay": true,
+        "underlay_content": {
+          "title": "Live lineup",
+          "placeholder_cards": [
+            {
+              "type": "large content card",
+              "size": "342x430"
+            },
+            {
+              "type": "summary strip",
+              "size": "342x88"
+            }
+          ]
+        }
+      },
+      "modal_card": {
+        "style": {
+          "background": "glass dark gradient",
+          "backdrop_blur": 14,
+          "radius": 32,
+          "shadow": "deep modal shadow"
+        },
+        "athlete": {
+          "club": "FLA",
+          "name": "Pedro",
+          "position_and_match": "ATA • Flamengo • vs CAP",
+          "price": "C$ 18.70",
+          "last_score": "últ. 12.9"
+        },
+        "dismiss_button": {
+          "label": "x",
+          "shape": "rounded square"
+        },
+        "metric_cards": [
+          {
+            "label": "score",
+            "value": 10.4,
+            "accent": "gold"
+          },
+          {
+            "label": "média recente",
+            "value": 8.7
+          },
+          {
+            "label": "valor",
+            "value": "A+",
+            "accent": "green"
+          }
+        ],
+        "scout": {
+          "title": "Scout disponível",
+          "items": [
+            "5 finalizações",
+            "2 grandes chances",
+            "1 gol proj."
+          ]
+        },
+        "justification": {
+          "title": "Justificativa",
+          "text": "Momento ofensivo forte, alta centralidade nas finalizações e adversário cedendo volume na área. O modelo destaca teto elevado mesmo com custo premium."
+        },
+        "primary_cta": "Ver atleta na lista"
+      }
+    }
+  ],
+  "entities": {
+    "teams_seen": [
+      "BAH",
+      "FLA",
+      "VAS",
+      "PAL",
+      "FLU",
+      "GRE",
+      "CAP"
+    ],
+    "players_seen": [
+      "Erick",
+      "Pedro",
+      "Vegetti",
+      "Ayrton",
+      "Gomez",
+      "Murilo",
+      "Arias",
+      "Ganso",
+      "De La Cruz",
+      "Alan P.",
+      "Bento",
+      "Tite Costa"
+    ],
+    "formations_seen": [
+      "4-3-3",
+      "3-4-3",
+      "4-4-2"
+    ],
+    "monetary_values_seen": [
+      "C$ 120.00",
+      "C$ 11.1",
+      "C$ 118.44",
+      "C$ 1.56",
+      "C$ 8.32",
+      "C$ 18.70"
+    ],
+    "scores_seen": [
+      "82.4",
+      "82.4 pts",
+      "10.4",
+      "9.2",
+      "9.0",
+      "8.8",
+      "8.7",
+      "8.1",
+      "7.9",
+      "7.7",
+      "7.5",
+      "7.4",
+      "7.1",
+      "6.8",
+      "6.6",
+      "6.4"
+    ]
+  },
+  "llm_ready_summary": {
+    "product_name": "Cartola Oracle",
+    "product_type": "app mobile conceitual para recomendacao e visualizacao de escalacao de fantasy futebol",
+    "main_user_flow": [
+      "Usuario chega na home",
+      "Define orçamento e formação",
+      "Toca em 'Gerar melhor time'",
+      "Visualiza resultado no campo tatico",
+      "Abre modal analitico de um atleta para entender score, scout e justificativa"
+    ],
+    "information_density": "alta",
+    "interaction_pattern": "cards empilhados, tabs de formação, chips informativos e modal de drill-down",
+    "recommended_use_for_llm": [
+      "gerar descricoes da UI",
+      "fazer reverse engineering do design",
+      "criar prompts para reconstruir a interface em React/Tailwind",
+      "extrair entidades e dados de negocio exibidos na interface"
+    ]
+  }
+}

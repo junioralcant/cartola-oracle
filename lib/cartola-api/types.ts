@@ -26,6 +26,7 @@ export interface NormalizedMarketStatus {
 export interface NormalizedAthlete {
   id: number;
   name: string;
+  statusId: number | null;
   positionId: number;
   clubId: number;
   price: number;

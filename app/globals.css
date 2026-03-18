@@ -1,9 +1,44 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: "Avenir Next", "Trebuchet MS", sans-serif;
+  --font-sans: var(--font-ui);
+  --font-ui: system-ui, sans-serif;
   --font-serif: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+:root {
+  --font-ui: system-ui, sans-serif;
+  --color-bg-canvas-start: #181421;
+  --color-bg-canvas-mid: #211c2e;
+  --color-bg-canvas-end: #262033;
+  --color-bg-surface: #ffffff0d;
+  --color-bg-surface-strong: #ffffff0f;
+  --color-bg-surface-alt: #634aff24;
+  --color-bg-overlay: #141222c7;
+  --color-border-subtle: #ffffff14;
+  --color-border-soft: #ffffff24;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #eeeaffb8;
+  --color-text-muted: #ffffff99;
+  --color-text-tertiary: #ffffff85;
+  --color-brand-primary: #a791ff;
+  --color-brand-secondary: #c5b8ff;
+  --color-brand-accent: #6f4dff;
+  --color-success: #8df8c7;
+  --color-warning: #ffcf66;
+  --color-danger: #b91c1c;
+  --gradient-canvas: linear-gradient(180deg, #181421 0%, #211c2e 45%, #262033 100%);
+  --gradient-button: linear-gradient(90deg, #6f4dff 0%, #8d79ff 100%);
+  --gradient-card: linear-gradient(180deg, rgba(50, 45, 70, 0.92) 0%, rgba(58, 53, 80, 0.9) 100%);
+  --gradient-card-analytics: linear-gradient(180deg, rgba(70, 55, 110, 0.82) 0%, rgba(50, 40, 90, 0.92) 100%);
+  --gradient-card-success: linear-gradient(180deg, rgba(70, 95, 80, 0.92) 0%, rgba(45, 70, 60, 0.9) 100%);
+  --shadow-glow: 0 24px 80px rgba(18, 12, 37, 0.58);
+  --shadow-card: 0 24px 70px rgba(8, 6, 20, 0.45);
+  --radius-card: 32px;
+  --radius-panel: 24px;
+  --radius-pill: 999px;
+  --space-screen: 24px;
 }
 
 * {
@@ -12,17 +47,20 @@
 
 html {
   background:
-    radial-gradient(circle at top, rgba(255, 216, 74, 0.14), transparent 22%),
-    linear-gradient(180deg, #2b2c2f 0%, #111214 30%, #0b0c0e 100%);
+    radial-gradient(circle at top right, rgba(111, 77, 255, 0.28), transparent 22%),
+    radial-gradient(circle at 20% 44%, rgba(141, 248, 199, 0.12), transparent 24%),
+    radial-gradient(circle at 82% 88%, rgba(255, 207, 102, 0.14), transparent 20%),
+    var(--gradient-canvas);
 }
 
 body {
   margin: 0;
   min-height: 100vh;
   background: transparent;
-  color: #f7f7f8;
+  color: var(--color-text-primary);
   font-family: var(--font-sans);
   line-height: 1.5;
+  text-rendering: optimizeLegibility;
 }
 
 a {
@@ -44,8 +82,9 @@ select {
 
 button:focus-visible,
 input:focus-visible,
-select:focus-visible {
-  outline: 3px solid color-mix(in srgb, #ffd84a 70%, white);
+select:focus-visible,
+[role="dialog"]:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-brand-primary) 72%, white);
   outline-offset: 2px;
 }
 
@@ -67,6 +106,11 @@ dt,
 dd {
   word-break: break-word;
   overflow-wrap: anywhere;
+}
+
+::selection {
+  background: rgba(167, 145, 255, 0.45);
+  color: var(--color-text-primary);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -6,6 +6,21 @@
       "sourceType": "github",
       "computedHash": "063a0e6448123cd359ad0044cc46b0e490cc7964d45ef4bb9fd842bd2ffbca67"
     },
+    "motion": {
+      "source": "pedronauck/skills",
+      "sourceType": "github",
+      "computedHash": "770b1e98eb5e82487fe500a28e77c74aa6d9dc32937298d85538a150ddc2c9ec"
+    },
+    "react": {
+      "source": "pedronauck/skills",
+      "sourceType": "github",
+      "computedHash": "cc809ab22b2fee72903f73d450b11c7d500e6a61641e7bcd427f3034a9c8832f"
+    },
+    "tailwindcss": {
+      "source": "pedronauck/skills",
+      "sourceType": "github",
+      "computedHash": "d7b9e3e49ffd0f4d2185d894568035633d31a0b7cb09494c6c0df4799a0a3ff3"
+    },
     "ui-ux-pro-max": {
       "source": "nextlevelbuilder/ui-ux-pro-max-skill",
       "sourceType": "github",

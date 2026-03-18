@@ -15,6 +15,7 @@ export interface GenerateLineupSummary {
 export interface GenerateLineupResponse {
   marketRound: number;
   marketStatus: MarketStatus;
+  isPartial: boolean;
   lineup: GeneratedLineup;
   summary: GenerateLineupSummary;
   warnings: string[];
