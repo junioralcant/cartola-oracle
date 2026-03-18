@@ -1,6 +1,5 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
 import {
   GenerateLineupError,
   GenerateLineupResponse,
@@ -13,6 +12,9 @@ import {
   ScoredCoach,
   ScoredPlayer,
 } from "@/lib/domain/types";
+import { getClubCardTint } from "@/lib/ui/club-colors";
+import useEmblaCarousel from "embla-carousel-react";
+import { CSSProperties, FormEvent, useMemo, useState } from "react";
 
 type FieldErrors = {
   budget?: string;
@@ -152,18 +154,34 @@ function ClubBadge({
         src={shieldUrl}
         alt={`${abbreviation} escudo`}
         loading="lazy"
+        draggable={false}
       />
     </span>
   );
 }
 
 function PlayerTile({ player }: { player: ScoredPlayer }) {
+  const teamTint = useMemo(() => getClubCardTint(player.clubAbbreviation), [player.clubAbbreviation]);
+
+  const tileStyle = useMemo<CSSProperties>(
+    () => ({
+      background: `linear-gradient(180deg,rgba(255,255,255,0.05),transparent 18%), linear-gradient(145deg,rgba(${teamTint.surfaceStrongRgb},0.25),rgba(${teamTint.surfaceSoftRgb},0.17) 48%,rgba(23,24,28,0.98))`,
+      borderColor: `rgba(${teamTint.borderRgb},0.44)`,
+    }),
+    [teamTint.borderRgb, teamTint.surfaceSoftRgb, teamTint.surfaceStrongRgb],
+  );
+
   const matchupLabel = player.opponentClubAbbreviation
     ? `${player.opponentClubAbbreviation} ${player.isHome ? "em casa" : "fora"}`
     : "Adversario indefinido";
 
   return (
-    <article className="grid gap-3 rounded-[1.25rem] border border-white/8 p-[14px] [background:linear-gradient(180deg,rgba(255,255,255,0.03),transparent_20%),#212328]">
+    <article
+      className="grid gap-3 rounded-[1.25rem] border p-[14px]"
+      style={tileStyle}
+      data-testid={`player-card-${player.id}`}
+      data-team-color-source={teamTint.isFallback ? "fallback" : "mapped"}
+    >
       <div className="flex items-center justify-between gap-3">
         <span className="inline-flex min-h-[1.7rem] items-center rounded-full bg-white/92 px-[0.65rem] py-[0.2rem] text-[0.66rem] font-extrabold uppercase tracking-[0.08em] text-[#191a1d]">
           Live
@@ -192,6 +210,7 @@ function PlayerTile({ player }: { player: ScoredPlayer }) {
                   src={player.opponentClubShieldUrl}
                   alt={`${player.opponentClubAbbreviation ?? "Rival"} escudo rival`}
                   loading="lazy"
+                  draggable={false}
                 />
               ) : null}
               <span>{matchupLabel}</span>
@@ -211,6 +230,42 @@ function PlayerTile({ player }: { player: ScoredPlayer }) {
       </dl>
       <p className="m-0 mt-[0.2rem] leading-[1.5] text-white/78">{player.justification}</p>
     </article>
+  );
+}
+
+type HorizontalPlayerTrackProps = {
+  group: GroupedPlayers;
+};
+
+function HorizontalPlayerTrack({ group }: HorizontalPlayerTrackProps) {
+  const emblaOptions = useMemo(
+    () => ({
+      axis: "x" as const,
+      align: "start" as const,
+      dragFree: true,
+      skipSnaps: true,
+      containScroll: false as const,
+    }),
+    [],
+  );
+  const [emblaRef] = useEmblaCarousel(emblaOptions);
+
+  return (
+    <div
+      ref={emblaRef}
+      className="overflow-hidden [touch-action:pan-y]"
+      data-testid={`player-track-${group.position}`}
+      data-carousel-lib="embla"
+      aria-label={`Lista horizontal de ${group.label}`}
+    >
+      <div className="flex gap-3 overflow-y-hidden pb-2 pr-1 [scrollbar-width:thin] [-webkit-overflow-scrolling:touch] [overscroll-behavior-x:contain] cursor-grab active:cursor-grabbing">
+        {group.players.map((player) => (
+          <div key={player.id} className="min-w-[16.5rem] shrink-0 basis-[min(86vw,20rem)]">
+            <PlayerTile player={player} />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -455,7 +510,7 @@ export function LineupGenerator() {
           </div>
         </header>
 
-        <section className={sectionCardClass}>
+        {/* <section className={sectionCardClass}>
           <div className={sectionHeadingClass}>
             <div>
               <p className={eyebrowClass}>Competiciones</p>
@@ -476,7 +531,7 @@ export function LineupGenerator() {
               </span>
             ))}
           </div>
-        </section>
+        </section> */}
 
         <section className="relative grid min-h-[15rem] w-full min-w-0 gap-3 overflow-hidden rounded-[1.6rem] border border-white/8 p-4 shadow-[0_28px_70px_rgba(0,0,0,0.42)] before:pointer-events-none before:absolute before:right-[-2rem] before:bottom-[-2rem] before:h-40 before:w-40 before:rounded-full before:[background:radial-gradient(circle,rgba(255,216,74,0.2),transparent_65%)] md:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)] md:items-end md:p-5 lg:p-6 [background:radial-gradient(circle_at_85%_20%,rgba(243,186,33,0.22),transparent_24%),linear-gradient(145deg,rgba(43,44,47,0.98),rgba(18,19,22,0.98))]">
           <div className="relative z-10 grid gap-3">
@@ -659,11 +714,7 @@ export function LineupGenerator() {
                       <h3 className="m-0 text-[1.2rem] font-[750] leading-[1.04]">{group.label}</h3>
                       <span className="text-white/56">{group.players.length} selecionados</span>
                     </div>
-                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-                      {group.players.map((player) => (
-                        <PlayerTile key={player.id} player={player} />
-                      ))}
-                    </div>
+                    <HorizontalPlayerTrack group={group} />
                   </section>
                 ))}
               </div>

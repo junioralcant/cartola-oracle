@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import Home from "./page";
 
 const successPayload = {
@@ -110,8 +110,38 @@ describe("Home", () => {
     expect(screen.getByText("Tite")).toBeInTheDocument();
     expect(screen.getAllByText("PAL em casa").length).toBeGreaterThan(0);
     expect(screen.getByAltText("PAL escudo rival")).toBeInTheDocument();
+    const attackerTrack = screen.getByTestId("player-track-ATA");
+    expect(attackerTrack).toHaveAttribute("data-carousel-lib", "embla");
+    expect(within(attackerTrack).getAllByTestId(/player-card-/i)).toHaveLength(3);
+    expect(screen.getByTestId("player-card-5")).toHaveAttribute("data-team-color-source", "mapped");
     expect(screen.getByText(/matches: missing matchup for club 40/i)).toBeInTheDocument();
     expect(screen.getByText(/Time otimizado para maximizar o score total/i)).toBeInTheDocument();
+  });
+
+  it("uses fallback team tint when club abbreviation is not mapped", async () => {
+    const payloadWithUnknownClub = {
+      ...successPayload,
+      lineup: {
+        ...successPayload.lineup,
+        players: successPayload.lineup.players.map((player) =>
+          player.id === 10 ? { ...player, clubAbbreviation: "XYZ" } : player,
+        ),
+      },
+    };
+
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => payloadWithUnknownClub,
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<Home />);
+
+    fireEvent.click(screen.getByRole("button", { name: /Gerar time/i }));
+
+    await screen.findByTestId("player-card-10");
+    expect(screen.getByTestId("player-card-10")).toHaveAttribute("data-team-color-source", "fallback");
   });
 
   it("renders functional errors from the API", async () => {
