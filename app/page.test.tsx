@@ -51,7 +51,9 @@ describe("Home", () => {
     render(<Home />);
 
     expect(
-      screen.getByRole("heading", { name: /Monte seu time ideal/i }),
+      screen.getByRole("heading", {
+        name: /Monte seu time ideal com leitura de app esportivo/i,
+      }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/Cartoletas disponiveis/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Formacao/i)).toBeInTheDocument();
@@ -102,8 +104,8 @@ describe("Home", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /Gerar time/i }));
 
-    expect(await screen.findByText(/Time sugerido para a rodada 12/i)).toBeInTheDocument();
-    expect(screen.getByText(/11 jogadores escalados/i)).toBeInTheDocument();
+    expect((await screen.findAllByText(/Time sugerido para a rodada 12/i)).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/11 jogadores escalados/i).length).toBeGreaterThan(0);
     expect(screen.getByText("Pedro")).toBeInTheDocument();
     expect(screen.getByText("Tite")).toBeInTheDocument();
     expect(screen.getByText(/matches: missing matchup for club 40/i)).toBeInTheDocument();
@@ -174,6 +176,6 @@ describe("Home", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /Gerar time/i }));
 
-    expect(await screen.findByText(/Time sugerido para a rodada 12/i)).toBeInTheDocument();
+    expect((await screen.findAllByText(/Time sugerido para a rodada 12/i)).length).toBeGreaterThan(0);
   });
 });

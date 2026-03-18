@@ -45,6 +45,7 @@ export interface NormalizedClub {
   id: number;
   name: string;
   abbreviation: string;
+  shieldUrl?: string;
 }
 
 export interface NormalizedMarketAthletes {
@@ -73,4 +74,3 @@ export interface CartolaApiClient {
   getMatches(): Promise<ApiResult<NormalizedMatch[]>>;
   getClubs(): Promise<ApiResult<Record<number, NormalizedClub>>>;
 }
-

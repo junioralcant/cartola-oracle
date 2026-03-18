@@ -74,6 +74,7 @@ export interface ScoredPlayer {
   position: Position;
   clubId: number;
   clubAbbreviation: string;
+  clubShieldUrl?: string;
   price: number;
   score: number;
   justification: string;
@@ -84,6 +85,7 @@ export interface ScoredCoach {
   name: string;
   clubId: number;
   clubAbbreviation: string;
+  clubShieldUrl?: string;
   price: number;
   score: number;
   justification: string;

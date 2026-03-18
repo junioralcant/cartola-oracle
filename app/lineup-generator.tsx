@@ -29,6 +29,7 @@ type ViewState =
 type GroupedPlayers = {
   position: Position;
   label: string;
+  shortLabel: string;
   players: ScoredPlayer[];
 };
 
@@ -42,6 +43,14 @@ const POSITION_LABELS: Record<Position, string> = {
   ATA: "Atacantes",
 };
 
+const POSITION_SHORT_LABELS: Record<Position, string> = {
+  GOL: "Gol",
+  LAT: "Lat",
+  ZAG: "Zag",
+  MEI: "Mei",
+  ATA: "Ata",
+};
+
 const MARKET_STATUS_LABELS: Record<GenerateLineupResponse["marketStatus"], string> = {
   open: "Mercado aberto",
   closed: "Mercado fechado",
@@ -51,6 +60,19 @@ const MARKET_STATUS_LABELS: Record<GenerateLineupResponse["marketStatus"], strin
 
 const TECHNICAL_ERROR_MESSAGE =
   "Nao foi possivel carregar uma sugestao agora. Tente novamente em instantes.";
+
+const FEATURED_LEAGUES = [
+  { name: "Brasileirao", accentClassName: "league-pill--gold" },
+  { name: "Serie A", accentClassName: "league-pill--blue" },
+  { name: "Mata-mata", accentClassName: "league-pill--red" },
+  { name: "Scout Pro", accentClassName: "league-pill--lime" },
+];
+
+const QUICK_STATS = [
+  { label: "Fluxo", value: "Mobile first" },
+  { label: "Modelos", value: `${SUPPORTED_FORMATIONS.length} formacoes` },
+  { label: "Leitura", value: "Score + motivo" },
+];
 
 const formatCurrency = (value: number): string =>
   value.toLocaleString("pt-BR", {
@@ -81,20 +103,47 @@ const groupPlayers = (players: ScoredPlayer[]): GroupedPlayers[] =>
   POSITION_ORDER.map((position) => ({
     position,
     label: POSITION_LABELS[position],
+    shortLabel: POSITION_SHORT_LABELS[position],
     players: players.filter((player) => player.position === position),
   })).filter((group) => group.players.length > 0);
 
-function PlayerCard({ player }: { player: ScoredPlayer }) {
+function ClubBadge({
+  abbreviation,
+  shieldUrl,
+}: {
+  abbreviation: string;
+  shieldUrl?: string;
+}) {
+  if (!shieldUrl) {
+    return null;
+  }
+
   return (
-    <article className="player-card">
-      <div className="player-card__header">
-        <div>
-          <p className="player-card__eyebrow">{POSITION_LABELS[player.position]}</p>
-          <h3>{player.name}</h3>
-        </div>
-        <div className="player-card__badge">{player.clubAbbreviation}</div>
+    <span className="club-badge" aria-hidden="true">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className="club-badge__shield" src={shieldUrl} alt={`${abbreviation} escudo`} loading="lazy" />
+    </span>
+  );
+}
+
+function PlayerTile({ player }: { player: ScoredPlayer }) {
+  return (
+    <article className="player-tile">
+      <div className="player-tile__topline">
+        <span className="player-tile__live-badge">Live</span>
+        <span className="player-tile__position">{POSITION_SHORT_LABELS[player.position]}</span>
       </div>
-      <dl className="player-card__metrics">
+      <div className="player-tile__identity">
+        <div>
+          <h3>{player.name}</h3>
+          <p>{POSITION_LABELS[player.position]}</p>
+        </div>
+        <ClubBadge
+          abbreviation={player.clubAbbreviation}
+          shieldUrl={player.clubShieldUrl}
+        />
+      </div>
+      <dl className="player-tile__stats">
         <div>
           <dt>Preco</dt>
           <dd>C$ {formatCurrency(player.price)}</dd>
@@ -104,33 +153,123 @@ function PlayerCard({ player }: { player: ScoredPlayer }) {
           <dd>{formatScore(player.score)}</dd>
         </div>
       </dl>
-      <p className="player-card__reason">{player.justification}</p>
+      <p className="player-tile__reason">{player.justification}</p>
     </article>
   );
 }
 
-function CoachCard({ coach }: { coach: ScoredCoach }) {
+function CoachHighlight({ coach }: { coach: ScoredCoach }) {
   return (
-    <article className="coach-card">
-      <div className="coach-card__header">
+    <article className="coach-highlight">
+      <div className="section-heading">
         <div>
-          <p className="player-card__eyebrow">Tecnico</p>
-          <h3>{coach.name}</h3>
+          <p className="section-heading__eyebrow">Comando</p>
+          <h2>Tecnico em destaque</h2>
         </div>
-        <div className="player-card__badge">{coach.clubAbbreviation}</div>
+        <span className="section-link">Ver perfil</span>
       </div>
-      <dl className="player-card__metrics">
-        <div>
-          <dt>Preco</dt>
-          <dd>C$ {formatCurrency(coach.price)}</dd>
+
+      <div className="coach-highlight__card">
+        <div className="coach-highlight__header">
+          <div>
+            <p className="coach-highlight__label">Tecnico</p>
+            <h3>{coach.name}</h3>
+          </div>
+          <ClubBadge
+            abbreviation={coach.clubAbbreviation}
+            shieldUrl={coach.clubShieldUrl}
+          />
         </div>
-        <div>
-          <dt>Score</dt>
-          <dd>{formatScore(coach.score)}</dd>
-        </div>
-      </dl>
-      <p className="player-card__reason">{coach.justification}</p>
+        <dl className="player-tile__stats">
+          <div>
+            <dt>Preco</dt>
+            <dd>C$ {formatCurrency(coach.price)}</dd>
+          </div>
+          <div>
+            <dt>Score</dt>
+            <dd>{formatScore(coach.score)}</dd>
+          </div>
+        </dl>
+        <p className="player-tile__reason">{coach.justification}</p>
+      </div>
     </article>
+  );
+}
+
+function StatusPanel({
+  viewState,
+  onReset,
+}: {
+  viewState: ViewState;
+  onReset: () => void;
+}) {
+  if (viewState.status === "loading") {
+    return (
+      <section className="status-panel status-panel--loading" aria-live="polite">
+        <p className="section-heading__eyebrow">Ao vivo</p>
+        <h2>Montando o melhor time para esta rodada</h2>
+        <p>Calculando score, custo e encaixe ideal da formacao escolhida.</p>
+      </section>
+    );
+  }
+
+  if (viewState.status === "functional-error") {
+    return (
+      <section className="status-panel status-panel--error" aria-live="polite">
+        <p className="section-heading__eyebrow">Ajuste necessario</p>
+        <h2>{viewState.error.message}</h2>
+        {viewState.warnings.length > 0 ? (
+          <ul className="insight-list" aria-label="Warnings da requisicao">
+            {viewState.warnings.map((warning) => (
+              <li key={warning}>{warning}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>Revise o teto de cartoletas ou troque a formacao para tentar de novo.</p>
+        )}
+      </section>
+    );
+  }
+
+  if (viewState.status === "technical-error") {
+    return (
+      <section className="status-panel status-panel--error" aria-live="polite">
+        <p className="section-heading__eyebrow">Falha tecnica</p>
+        <h2>{viewState.message}</h2>
+        <p>Revise a conexao ou tente novamente para buscar uma nova sugestao.</p>
+        <button className="secondary-action" type="button" onClick={onReset}>
+          Tentar novamente
+        </button>
+      </section>
+    );
+  }
+
+  if (viewState.status === "success") {
+    return (
+      <section className="status-panel status-panel--success" aria-live="polite">
+        <p className="section-heading__eyebrow">Resumo rapido</p>
+        <h2>Time sugerido para a rodada {viewState.data.marketRound}</h2>
+        <p>{MARKET_STATUS_LABELS[viewState.data.marketStatus]}</p>
+        <div className="status-panel__metrics">
+          <div>
+            <span>Formacao</span>
+            <strong>{viewState.data.summary.formation}</strong>
+          </div>
+          <div>
+            <span>Saldo</span>
+            <strong>C$ {formatCurrency(viewState.data.summary.remainingBudget)}</strong>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="status-panel" aria-live="polite">
+      <p className="section-heading__eyebrow">Painel</p>
+      <h2>Escolha o orcamento e a formacao para receber um elenco completo.</h2>
+      <p>O resultado mostra titulares, tecnico, score projetado, custo total e avisos da rodada.</p>
+    </section>
   );
 }
 
@@ -210,170 +349,187 @@ export function LineupGenerator() {
     }
   };
 
-  const renderFeedback = () => {
-    if (viewState.status === "loading") {
-      return (
-        <section className="feedback-panel feedback-panel--loading" aria-live="polite">
-          <p className="feedback-panel__eyebrow">Processando</p>
-          <h2>Montando o melhor time para esta rodada</h2>
-          <p>Calculando score, equilibrio de custo e encaixe da formacao escolhida.</p>
-        </section>
-      );
-    }
-
-    if (viewState.status === "functional-error") {
-      return (
-        <section className="feedback-panel feedback-panel--error" aria-live="polite">
-          <p className="feedback-panel__eyebrow">Ajuste necessario</p>
-          <h2>{viewState.error.message}</h2>
-          {viewState.warnings.length > 0 ? (
-            <ul className="feedback-list" aria-label="Warnings da requisicao">
-              {viewState.warnings.map((warning) => (
-                <li key={warning}>{warning}</li>
-              ))}
-            </ul>
-          ) : null}
-        </section>
-      );
-    }
-
-    if (viewState.status === "technical-error") {
-      return (
-        <section className="feedback-panel feedback-panel--error" aria-live="polite">
-          <p className="feedback-panel__eyebrow">Falha tecnica</p>
-          <h2>{viewState.message}</h2>
-          <p>Revise a conexao ou tente novamente para buscar uma nova sugestao.</p>
-          <button className="secondary-action" type="button" onClick={() => setViewState({ status: "idle" })}>
-            Tentar novamente
-          </button>
-        </section>
-      );
-    }
-
-    return (
-      <section className="feedback-panel feedback-panel--idle" aria-live="polite">
-        <p className="feedback-panel__eyebrow">Pronto para gerar</p>
-        <h2>Escolha o orcamento e a formacao para receber um elenco completo.</h2>
-        <p>O resultado mostra titulares, tecnico, score projetado, custo total, saldo e observacoes da rodada.</p>
-      </section>
-    );
-  };
-
   return (
-    <main className="oracle-shell">
-      <section className="oracle-hero">
-        <div className="oracle-hero__copy">
-          <p className="kicker">Cartola Oracle</p>
-          <h1>Monte seu time ideal com leitura rapida, criterio tecnico e foco mobile.</h1>
-          <p className="lede">
-            Gere uma escalacao completa a partir do seu orcamento, acompanhe os avisos da rodada
-            e entenda por que cada nome entrou no time.
-          </p>
-        </div>
-        <div className="hero-chip-row" aria-label="Destaques da interface">
-          <span>Fluxo completo</span>
-          <span>7 formacoes</span>
-          <span>Score + justificativa</span>
-        </div>
-      </section>
-
-      <section className="oracle-grid">
-        <div className="panel panel--form">
-          <div className="panel__heading">
-            <p className="panel__eyebrow">Parametros</p>
-            <h2>Gerar time</h2>
+    <main className="oracle-app-shell">
+      <section className="app-frame">
+        <header className="topbar">
+          <div className="brand-lockup" aria-label="Cartola Oracle">
+            <span className="brand-lockup__word">CARTOLA</span>
+            <span className="brand-lockup__mark" aria-hidden="true" />
+            <span className="brand-lockup__word brand-lockup__word--accent">ORACLE</span>
           </div>
-          <form className="lineup-form" onSubmit={handleSubmit} noValidate>
-            <label className="field" htmlFor="budget">
-              <span>Cartoletas disponiveis</span>
-              <input
-                id="budget"
-                name="budget"
-                type="number"
-                inputMode="decimal"
-                min="0"
-                step="0.01"
-                value={budget}
-                onChange={(event) => setBudget(event.target.value)}
-                aria-invalid={fieldErrors.budget ? "true" : "false"}
-                aria-describedby={fieldErrors.budget ? "budget-error" : "budget-help"}
-                placeholder="120.50"
-              />
-              <small id="budget-help">Informe o teto de cartoletas para montar o elenco.</small>
-              {fieldErrors.budget ? (
-                <strong className="field__error" id="budget-error">
-                  {fieldErrors.budget}
-                </strong>
-              ) : null}
-            </label>
+        </header>
 
-            <label className="field" htmlFor="formation">
-              <span>Formacao</span>
-              <select
-                id="formation"
-                name="formation"
-                value={formation}
-                onChange={(event) => setFormation(event.target.value as Formation)}
-                aria-invalid={fieldErrors.formation ? "true" : "false"}
-                aria-describedby={fieldErrors.formation ? "formation-error" : "formation-help"}
-              >
-                {SUPPORTED_FORMATIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-              <small id="formation-help">Todas as formacoes aceitas pelo contrato da API.</small>
-              {fieldErrors.formation ? (
-                <strong className="field__error" id="formation-error">
-                  {fieldErrors.formation}
-                </strong>
-              ) : null}
-            </label>
-
-            <button className="primary-action" type="submit" disabled={viewState.status === "loading"}>
-              {viewState.status === "loading" ? "Gerando time..." : "Gerar time"}
-            </button>
-          </form>
-        </div>
-
-        <div className="panel panel--feedback">{renderFeedback()}</div>
-      </section>
-
-      {viewState.status === "success" ? (
-        <section className="results-stack" aria-label="Resultado da escalacao">
-          <div className="summary-card">
+        <section className="section-block">
+          <div className="section-heading">
             <div>
-              <p className="panel__eyebrow">Resumo da rodada</p>
-              <h2>Time sugerido para a rodada {viewState.data.marketRound}</h2>
-              <p className="summary-card__market">{MARKET_STATUS_LABELS[viewState.data.marketStatus]}</p>
+              <p className="section-heading__eyebrow">Competiciones</p>
+              <h2>Leituras da rodada</h2>
             </div>
-            <dl className="summary-grid">
-              <div>
-                <dt>Formacao</dt>
-                <dd>{viewState.data.summary.formation}</dd>
+            <span className="section-link">Ver tudo</span>
+          </div>
+          <div className="league-strip" aria-label="Destaques da interface">
+            {FEATURED_LEAGUES.map((league) => (
+              <span key={league.name} className={`league-pill ${league.accentClassName}`}>
+                {league.name}
+              </span>
+            ))}
+          </div>
+        </section>
+
+        <section className="hero-card">
+          <div className="hero-card__copy">
+            <p className="section-heading__eyebrow">Cartola Oracle</p>
+            <h1>Monte seu time ideal com leitura de app esportivo e foco total na rodada.</h1>
+            <p>
+              Gere uma escalacao completa a partir do seu orcamento, compare score projetado e
+              entenda por que cada nome entrou no time.
+            </p>
+          </div>
+          <div className="hero-card__stats">
+            {QUICK_STATS.map((item) => (
+              <div key={item.label} className="hero-stat">
+                <span>{item.label}</span>
+                <strong>{item.value}</strong>
               </div>
-              <div>
-                <dt>Score total</dt>
-                <dd>{formatScore(viewState.data.summary.totalScore)}</dd>
-              </div>
-              <div>
-                <dt>Custo total</dt>
-                <dd>C$ {formatCurrency(viewState.data.summary.totalCost)}</dd>
-              </div>
-              <div>
-                <dt>Saldo</dt>
-                <dd>C$ {formatCurrency(viewState.data.summary.remainingBudget)}</dd>
-              </div>
-            </dl>
+            ))}
+          </div>
+        </section>
+
+        <section className="section-block">
+          <div className="section-heading">
+            <div>
+              <p className="section-heading__eyebrow">Live Matches</p>
+              <h2>Central do time</h2>
+            </div>
+            <span className="section-link">View all</span>
           </div>
 
-          <div className="content-grid">
-            <section className="panel panel--lineup">
-              <div className="panel__heading">
-                <p className="panel__eyebrow">Elenco</p>
-                <h2>11 jogadores escalados</h2>
+          <div className="generator-grid">
+            <form className="generator-card" onSubmit={handleSubmit} noValidate>
+              <div className="generator-card__topline">
+                <span className="generator-pill">Live</span>
+                <span className="generator-card__hint">Atualize em segundos</span>
               </div>
+
+              <div className="generator-card__body">
+                <div>
+                  <h2>Gerar time</h2>
+                  <p>
+                    Ajuste cartoletas e formacao para liberar uma sugestao pronta para escalar.
+                  </p>
+                </div>
+
+                <label className="field" htmlFor="budget">
+                  <span>Cartoletas disponiveis</span>
+                  <input
+                    id="budget"
+                    name="budget"
+                    type="number"
+                    inputMode="decimal"
+                    min="0"
+                    step="0.01"
+                    value={budget}
+                    onChange={(event) => setBudget(event.target.value)}
+                    aria-invalid={fieldErrors.budget ? "true" : "false"}
+                    aria-describedby={fieldErrors.budget ? "budget-error" : "budget-help"}
+                    placeholder="120.50"
+                  />
+                  <small id="budget-help">Defina o teto de cartoletas para montar o elenco.</small>
+                  {fieldErrors.budget ? (
+                    <strong className="field__error" id="budget-error">
+                      {fieldErrors.budget}
+                    </strong>
+                  ) : null}
+                </label>
+
+                <label className="field" htmlFor="formation">
+                  <span>Formacao</span>
+                  <select
+                    id="formation"
+                    name="formation"
+                    value={formation}
+                    onChange={(event) => setFormation(event.target.value as Formation)}
+                    aria-invalid={fieldErrors.formation ? "true" : "false"}
+                    aria-describedby={
+                      fieldErrors.formation ? "formation-error" : "formation-help"
+                    }
+                  >
+                    {SUPPORTED_FORMATIONS.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                  <small id="formation-help">Todas as formacoes aceitas pelo contrato da API.</small>
+                  {fieldErrors.formation ? (
+                    <strong className="field__error" id="formation-error">
+                      {fieldErrors.formation}
+                    </strong>
+                  ) : null}
+                </label>
+
+                <button
+                  className="primary-action"
+                  type="submit"
+                  disabled={viewState.status === "loading"}
+                >
+                  {viewState.status === "loading" ? "Gerando time..." : "Gerar time"}
+                </button>
+              </div>
+            </form>
+
+            <StatusPanel
+              viewState={viewState}
+              onReset={() => setViewState({ status: "idle" })}
+            />
+          </div>
+        </section>
+
+        {viewState.status === "success" ? (
+          <section className="results-stack" aria-label="Resultado da escalacao">
+            <section className="summary-showcase">
+              <div className="summary-showcase__header">
+                <div>
+                  <p className="section-heading__eyebrow">Round Summary</p>
+                  <h2>Time sugerido para a rodada {viewState.data.marketRound}</h2>
+                  <p>{MARKET_STATUS_LABELS[viewState.data.marketStatus]}</p>
+                </div>
+                <div className="summary-showcase__score">
+                  <span>Score total</span>
+                  <strong>{formatScore(viewState.data.summary.totalScore)}</strong>
+                </div>
+              </div>
+
+              <dl className="summary-grid">
+                <div>
+                  <dt>Formacao</dt>
+                  <dd>{viewState.data.summary.formation}</dd>
+                </div>
+                <div>
+                  <dt>Custo total</dt>
+                  <dd>C$ {formatCurrency(viewState.data.summary.totalCost)}</dd>
+                </div>
+                <div>
+                  <dt>Saldo</dt>
+                  <dd>C$ {formatCurrency(viewState.data.summary.remainingBudget)}</dd>
+                </div>
+                <div>
+                  <dt>Titulares</dt>
+                  <dd>11 jogadores escalados</dd>
+                </div>
+              </dl>
+            </section>
+
+            <section className="section-block">
+              <div className="section-heading">
+                <div>
+                  <p className="section-heading__eyebrow">Live Matches</p>
+                  <h2>11 jogadores escalados</h2>
+                </div>
+                <span className="section-link">View all</span>
+              </div>
+
               <div className="position-groups">
                 {groupedPlayers.map((group) => (
                   <section key={group.position} className="position-group" aria-label={group.label}>
@@ -381,9 +537,9 @@ export function LineupGenerator() {
                       <h3>{group.label}</h3>
                       <span>{group.players.length} selecionados</span>
                     </div>
-                    <div className="position-group__list">
+                    <div className="player-grid">
                       {group.players.map((player) => (
-                        <PlayerCard key={player.id} player={player} />
+                        <PlayerTile key={player.id} player={player} />
                       ))}
                     </div>
                   </section>
@@ -391,22 +547,19 @@ export function LineupGenerator() {
               </div>
             </section>
 
-            <aside className="side-stack">
-              <section className="panel panel--coach">
-                <div className="panel__heading">
-                  <p className="panel__eyebrow">Comando</p>
-                  <h2>Tecnico</h2>
-                </div>
-                <CoachCard coach={viewState.data.lineup.coach} />
-              </section>
+            <section className="bottom-grid">
+              <CoachHighlight coach={viewState.data.lineup.coach} />
 
               {viewState.data.explanations.length > 0 ? (
-                <section className="panel panel--notes">
-                  <div className="panel__heading">
-                    <p className="panel__eyebrow">Leitura</p>
-                    <h2>Justificativas gerais</h2>
+                <section className="insight-panel">
+                  <div className="section-heading">
+                    <div>
+                      <p className="section-heading__eyebrow">Latest News</p>
+                      <h2>Justificativas gerais</h2>
+                    </div>
+                    <span className="section-link">Oracle read</span>
                   </div>
-                  <ul className="bullet-list" aria-label="Justificativas gerais">
+                  <ul className="insight-list" aria-label="Justificativas gerais">
                     {viewState.data.explanations.map((explanation) => (
                       <li key={explanation}>{explanation}</li>
                     ))}
@@ -415,22 +568,25 @@ export function LineupGenerator() {
               ) : null}
 
               {viewState.data.warnings.length > 0 ? (
-                <section className="panel panel--warnings">
-                  <div className="panel__heading">
-                    <p className="panel__eyebrow">Atencao</p>
-                    <h2>Warnings</h2>
+                <section className="insight-panel insight-panel--warning">
+                  <div className="section-heading">
+                    <div>
+                      <p className="section-heading__eyebrow">Alerts</p>
+                      <h2>Warnings</h2>
+                    </div>
+                    <span className="section-link">Acompanhar</span>
                   </div>
-                  <ul className="bullet-list bullet-list--warning" aria-label="Warnings da rodada">
+                  <ul className="insight-list" aria-label="Warnings da rodada">
                     {viewState.data.warnings.map((warning) => (
                       <li key={warning}>{warning}</li>
                     ))}
                   </ul>
                 </section>
               ) : null}
-            </aside>
-          </div>
-        </section>
-      ) : null}
+            </section>
+          </section>
+        ) : null}
+      </section>
     </main>
   );
 }

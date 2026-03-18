@@ -41,6 +41,21 @@ const asNumber = (value: unknown): number | null =>
 
 const asString = (value: unknown): string | null => (typeof value === "string" ? value : null);
 
+const selectShieldUrl = (escudos: unknown): string | null => {
+  if (!isObjectRecord(escudos)) {
+    return null;
+  }
+
+  for (const size of ["60x60", "45x45", "30x30"]) {
+    const candidate = asString(escudos[size]);
+    if (candidate) {
+      return candidate;
+    }
+  }
+
+  return null;
+};
+
 const asScout = (value: unknown): Record<string, number> => {
   if (!isObjectRecord(value)) {
     return {};
@@ -504,6 +519,7 @@ const normalizeClubsInternal = (
     const id = Number(idKey);
     const name = asString(value.nome);
     const abbreviation = asString(value.abreviacao);
+    const shieldUrl = selectShieldUrl(value.escudos);
 
     if (!Number.isFinite(id) || name === null || abbreviation === null) {
       warnings.push({
@@ -513,11 +529,17 @@ const normalizeClubsInternal = (
       continue;
     }
 
-    clubsById[id] = {
+    const club: NormalizedClub = {
       id,
       name,
       abbreviation,
     };
+
+    if (shieldUrl) {
+      club.shieldUrl = shieldUrl;
+    }
+
+    clubsById[id] = club;
   }
 
   return { data: clubsById, warnings };

@@ -20,6 +20,7 @@ export interface PlayerContext {
   position: Position;
   clubId: number;
   clubAbbreviation: string;
+  clubShieldUrl?: string;
   price: number;
   averageScore: number;
   lastRoundScore: number;
@@ -33,6 +34,7 @@ export interface CoachContext {
   name: string;
   clubId: number;
   clubAbbreviation: string;
+  clubShieldUrl?: string;
   price: number;
   isHome: boolean;
   opponentClubId: number | null;
@@ -63,6 +65,7 @@ const buildMatchMap = (matches: NormalizedMatch[]): Map<number, MatchContext> =>
 };
 
 const getClubAbbreviation = (club?: NormalizedClub): string => club?.abbreviation ?? "Unknown";
+const getClubShieldUrl = (club?: NormalizedClub): string | undefined => club?.shieldUrl;
 
 const resolvePosition = (positionId: number): Position | undefined => POSITION_ID_TO_POSITION[positionId];
 
@@ -102,6 +105,7 @@ const mapAthlete = (
     position,
     clubId: athlete.clubId,
     clubAbbreviation: getClubAbbreviation(club),
+    clubShieldUrl: getClubShieldUrl(club),
     price: athlete.price,
     averageScore: athlete.averageScore,
     lastRoundScore: lastRoundEntry?.score ?? athlete.lastKnownScore,
@@ -132,6 +136,7 @@ const mapCoach = (
     name: coach.name,
     clubId: coach.clubId,
     clubAbbreviation: getClubAbbreviation(club),
+    clubShieldUrl: getClubShieldUrl(club),
     price: coach.price,
     isHome: match?.isHome ?? false,
     opponentClubId: match?.opponentClubId ?? null,
