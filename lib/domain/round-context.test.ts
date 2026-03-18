@@ -66,6 +66,7 @@ const mockMatchesResult = (): ApiResult<NormalizedMatch[]> => ({
 const mockClubsResult = (): ApiResult<Record<number, NormalizedClub>> => ({
   data: {
     10: { id: 10, name: "Flamengo", abbreviation: "FLA" },
+    20: { id: 20, name: "Internacional", abbreviation: "INT" },
   },
   warnings: [],
 });
@@ -94,6 +95,7 @@ describe("buildRoundContext", () => {
     expect(context.players[0].lastRoundScore).toBe(8.2);
     expect(context.players[0].isHome).toBe(true);
     expect(context.players[0].opponentClubId).toBe(20);
+    expect(context.players[0].opponentClubAbbreviation).toBe("INT");
     expect(context.coaches[0].clubAbbreviation).toBe("FLA");
     expect(context.warnings).not.toContain("market-status: status open");
   });

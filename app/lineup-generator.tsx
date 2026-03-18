@@ -158,6 +158,10 @@ function ClubBadge({
 }
 
 function PlayerTile({ player }: { player: ScoredPlayer }) {
+  const matchupLabel = player.opponentClubAbbreviation
+    ? `${player.opponentClubAbbreviation} ${player.isHome ? "em casa" : "fora"}`
+    : "Adversario indefinido";
+
   return (
     <article className="grid gap-3 rounded-[1.25rem] border border-white/8 p-[14px] [background:linear-gradient(180deg,rgba(255,255,255,0.03),transparent_20%),#212328]">
       <div className="flex items-center justify-between gap-3">
@@ -173,10 +177,27 @@ function PlayerTile({ player }: { player: ScoredPlayer }) {
           <h3 className="m-0 text-[1.25rem] font-[760] leading-[1.04]">{player.name}</h3>
           <p className="mt-[0.2rem] mb-0 leading-[1.5] text-white/78">{POSITION_LABELS[player.position]}</p>
         </div>
-        <ClubBadge
-          abbreviation={player.clubAbbreviation}
-          shieldUrl={player.clubShieldUrl}
-        />
+        <div className="grid justify-items-end gap-2 text-right">
+          <ClubBadge
+            abbreviation={player.clubAbbreviation}
+            shieldUrl={player.clubShieldUrl}
+          />
+          <div className="grid justify-items-end gap-1">
+            <span className="text-[0.72rem] uppercase tracking-[0.1em] text-white/56">Confronto</span>
+            <span className="inline-flex items-center gap-2 text-[0.86rem] font-[700]">
+              {player.opponentClubShieldUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  className="h-6 w-6 object-contain"
+                  src={player.opponentClubShieldUrl}
+                  alt={`${player.opponentClubAbbreviation ?? "Rival"} escudo rival`}
+                  loading="lazy"
+                />
+              ) : null}
+              <span>{matchupLabel}</span>
+            </span>
+          </div>
+        </div>
       </div>
       <dl className="grid gap-2">
         <div className="grid gap-2">

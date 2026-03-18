@@ -7,17 +7,17 @@ const successPayload = {
   lineup: {
     formation: "4-3-3",
     players: [
-      { id: 1, name: "Rossi", position: "GOL", clubId: 10, clubAbbreviation: "FLA", price: 8.4, score: 6.9, justification: "Sequencia consistente." },
-      { id: 2, name: "Ayrton", position: "LAT", clubId: 10, clubAbbreviation: "FLA", price: 9.1, score: 7.4, justification: "Boa chegada ao ataque." },
-      { id: 3, name: "Leo Ortiz", position: "ZAG", clubId: 10, clubAbbreviation: "FLA", price: 8.7, score: 7.2, justification: "Confronto favoravel." },
-      { id: 4, name: "Gerson", position: "MEI", clubId: 10, clubAbbreviation: "FLA", price: 12.2, score: 9.3, justification: "Participacao em jogadas decisivas." },
-      { id: 5, name: "Pedro", position: "ATA", clubId: 10, clubAbbreviation: "FLA", price: 15.9, score: 10.1, justification: "Volume alto de finalizacoes." },
-      { id: 6, name: "Fabricio", position: "LAT", clubId: 20, clubAbbreviation: "PAL", price: 7.3, score: 6.2, justification: "Regularidade defensiva." },
-      { id: 7, name: "Murilo", position: "ZAG", clubId: 20, clubAbbreviation: "PAL", price: 8.8, score: 6.8, justification: "Chance de SG elevada." },
-      { id: 8, name: "Veiga", position: "MEI", clubId: 20, clubAbbreviation: "PAL", price: 14.4, score: 9.1, justification: "Participa de bolas paradas." },
-      { id: 9, name: "Alisson", position: "MEI", clubId: 30, clubAbbreviation: "SAO", price: 10.1, score: 7.9, justification: "Bom valor por cartoleta." },
-      { id: 10, name: "Lucero", position: "ATA", clubId: 40, clubAbbreviation: "FOR", price: 11.2, score: 8.4, justification: "Enfrenta defesa vulneravel." },
-      { id: 11, name: "Yuri", position: "ATA", clubId: 50, clubAbbreviation: "COR", price: 9.8, score: 7.7, justification: "Boa fase recente." },
+      { id: 1, name: "Rossi", position: "GOL", clubId: 10, clubAbbreviation: "FLA", opponentClubAbbreviation: "PAL", opponentClubShieldUrl: "https://example.com/pal.png", isHome: true, price: 8.4, score: 6.9, justification: "Sequencia consistente." },
+      { id: 2, name: "Ayrton", position: "LAT", clubId: 10, clubAbbreviation: "FLA", opponentClubAbbreviation: "PAL", isHome: true, price: 9.1, score: 7.4, justification: "Boa chegada ao ataque." },
+      { id: 3, name: "Leo Ortiz", position: "ZAG", clubId: 10, clubAbbreviation: "FLA", opponentClubAbbreviation: "PAL", isHome: true, price: 8.7, score: 7.2, justification: "Confronto favoravel." },
+      { id: 4, name: "Gerson", position: "MEI", clubId: 10, clubAbbreviation: "FLA", opponentClubAbbreviation: "PAL", isHome: true, price: 12.2, score: 9.3, justification: "Participacao em jogadas decisivas." },
+      { id: 5, name: "Pedro", position: "ATA", clubId: 10, clubAbbreviation: "FLA", opponentClubAbbreviation: "PAL", isHome: true, price: 15.9, score: 10.1, justification: "Volume alto de finalizacoes." },
+      { id: 6, name: "Fabricio", position: "LAT", clubId: 20, clubAbbreviation: "PAL", opponentClubAbbreviation: "FLA", isHome: false, price: 7.3, score: 6.2, justification: "Regularidade defensiva." },
+      { id: 7, name: "Murilo", position: "ZAG", clubId: 20, clubAbbreviation: "PAL", opponentClubAbbreviation: "FLA", isHome: false, price: 8.8, score: 6.8, justification: "Chance de SG elevada." },
+      { id: 8, name: "Veiga", position: "MEI", clubId: 20, clubAbbreviation: "PAL", opponentClubAbbreviation: "FLA", isHome: false, price: 14.4, score: 9.1, justification: "Participa de bolas paradas." },
+      { id: 9, name: "Alisson", position: "MEI", clubId: 30, clubAbbreviation: "SAO", opponentClubAbbreviation: "FOR", isHome: true, price: 10.1, score: 7.9, justification: "Bom valor por cartoleta." },
+      { id: 10, name: "Lucero", position: "ATA", clubId: 40, clubAbbreviation: "FOR", opponentClubAbbreviation: "SAO", isHome: false, price: 11.2, score: 8.4, justification: "Enfrenta defesa vulneravel." },
+      { id: 11, name: "Yuri", position: "ATA", clubId: 50, clubAbbreviation: "COR", opponentClubAbbreviation: "SAN", isHome: true, price: 9.8, score: 7.7, justification: "Boa fase recente." },
     ],
     coach: {
       id: 90,
@@ -108,6 +108,8 @@ describe("Home", () => {
     expect(screen.getAllByText(/11 jogadores escalados/i).length).toBeGreaterThan(0);
     expect(screen.getByText("Pedro")).toBeInTheDocument();
     expect(screen.getByText("Tite")).toBeInTheDocument();
+    expect(screen.getAllByText("PAL em casa").length).toBeGreaterThan(0);
+    expect(screen.getByAltText("PAL escudo rival")).toBeInTheDocument();
     expect(screen.getByText(/matches: missing matchup for club 40/i)).toBeInTheDocument();
     expect(screen.getByText(/Time otimizado para maximizar o score total/i)).toBeInTheDocument();
   });

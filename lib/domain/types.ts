@@ -75,6 +75,9 @@ export interface ScoredPlayer {
   clubId: number;
   clubAbbreviation: string;
   clubShieldUrl?: string;
+  opponentClubAbbreviation: string | null;
+  opponentClubShieldUrl?: string;
+  isHome: boolean;
   price: number;
   score: number;
   justification: string;

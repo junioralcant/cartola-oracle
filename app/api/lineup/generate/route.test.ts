@@ -76,12 +76,12 @@ describe("POST /api/lineup/generate", () => {
       warnings: ["matches: missing matchup for club 10"],
     });
     mockScoreRoundContext.mockReturnValue({
-      players: [{ id: 123, name: "Pedro", position: "ATA", clubId: 10, clubAbbreviation: "FLA", price: 12.5, score: 8.91, justification: "ultima rodada forte." }],
+      players: [{ id: 123, name: "Pedro", position: "ATA", clubId: 10, clubAbbreviation: "FLA", opponentClubAbbreviation: "INT", isHome: true, price: 12.5, score: 8.91, justification: "ultima rodada forte." }],
       coaches: [{ id: 999, name: "Tecnico X", clubId: 10, clubAbbreviation: "FLA", price: 8, score: 6.4, justification: "clube em boa fase." }],
     });
     mockGenerateLineup.mockReturnValue({
       formation: "4-3-3",
-      players: [{ id: 123, name: "Pedro", position: "ATA", clubId: 10, clubAbbreviation: "FLA", price: 12.5, score: 8.91, justification: "ultima rodada forte." }],
+      players: [{ id: 123, name: "Pedro", position: "ATA", clubId: 10, clubAbbreviation: "FLA", opponentClubAbbreviation: "INT", isHome: true, price: 12.5, score: 8.91, justification: "ultima rodada forte." }],
       coach: { id: 999, name: "Tecnico X", clubId: 10, clubAbbreviation: "FLA", price: 8, score: 6.4, justification: "clube em boa fase." },
       totalCost: 118.3,
       totalScore: 79.54,

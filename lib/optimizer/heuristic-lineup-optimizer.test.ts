@@ -13,6 +13,8 @@ const makePlayer = (
   position,
   clubId: id % 20,
   clubAbbreviation: "CLB",
+  opponentClubAbbreviation: "RIV",
+  isHome: id % 2 === 0,
   price,
   score,
   justification: "fixture",

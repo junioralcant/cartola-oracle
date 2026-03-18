@@ -21,6 +21,8 @@ export interface PlayerContext {
   clubId: number;
   clubAbbreviation: string;
   clubShieldUrl?: string;
+  opponentClubAbbreviation: string | null;
+  opponentClubShieldUrl?: string;
   price: number;
   averageScore: number;
   lastRoundScore: number;
@@ -93,6 +95,7 @@ const mapAthlete = (
   if (!match) {
     warnings.push(`matches: missing matchup for club ${athlete.clubId}`);
   }
+  const opponentClub = match ? clubsById[match.opponentClubId] : undefined;
 
   const lastRoundEntry = lastRoundScores.get(athlete.id);
   if (lastRoundAvailable && !lastRoundEntry) {
@@ -106,6 +109,8 @@ const mapAthlete = (
     clubId: athlete.clubId,
     clubAbbreviation: getClubAbbreviation(club),
     clubShieldUrl: getClubShieldUrl(club),
+    opponentClubAbbreviation: opponentClub ? getClubAbbreviation(opponentClub) : null,
+    opponentClubShieldUrl: getClubShieldUrl(opponentClub),
     price: athlete.price,
     averageScore: athlete.averageScore,
     lastRoundScore: lastRoundEntry?.score ?? athlete.lastKnownScore,
