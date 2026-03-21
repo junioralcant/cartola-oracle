@@ -464,37 +464,7 @@ function StatusPanel({
     );
   }
 
-  return (
-    <section
-      className={cx(
-        surfaceCardClass,
-        "grid min-h-[286px] content-start gap-4 p-6 [background:linear-gradient(180deg,rgba(111,77,255,0.12),transparent_30%),linear-gradient(180deg,rgba(50,45,70,0.92),rgba(23,21,32,0.96))]",
-      )}
-      aria-live="polite"
-    >
-      <p className={eyebrowClass}>Painel</p>
-      <h2 className="m-0 max-w-[11ch] font-[var(--font-display)] text-[28px] leading-[1.15]">
-        Escolha o orcamento e a formacao para receber um elenco completo.
-      </h2>
-      <p className="m-0 text-[14px] leading-6 text-[color:var(--color-text-secondary)]">
-        O resultado mostra titulares, tecnico, score projetado, custo total e avisos da rodada.
-      </p>
-      <div className="grid grid-cols-2 gap-3">
-        <SummaryCard
-          title="API"
-          value="Ready"
-          subtitle="geracao em tempo real"
-          accent="purple"
-        />
-        <SummaryCard
-          title="Saida"
-          value="11+1"
-          subtitle="atletas e tecnico"
-          accent="default"
-        />
-      </div>
-    </section>
-  );
+  return null; // removed fallback card when no success data is available
 }
 
 function PlayerCardButton({
