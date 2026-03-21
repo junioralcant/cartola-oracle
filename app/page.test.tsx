@@ -43,13 +43,49 @@ const successPayload = {
   explanations: ["Time otimizado para maximizar o score total."],
 };
 
+const createStatusResponse = () => ({
+  ok: true,
+  status: 200,
+  json: async () => ({
+    marketRound: 28,
+    marketStatus: "open" as const,
+  }),
+});
+
+type FetchMock = ReturnType<typeof vi.fn>;
+
+const stubFetch = (handler?: (input: RequestInfo, init?: RequestInit) => Promise<Response>) => {
+  const fetchMock: FetchMock = vi.fn(async (input, init) => {
+    const url = typeof input === "string" ? input : input.url;
+    if (url.includes("/api/lineup/status")) {
+      return createStatusResponse();
+    }
+
+    if (handler) {
+      return handler(input, init);
+    }
+
+    throw new Error(`Unexpected fetch to ${url}`);
+  });
+  vi.stubGlobal("fetch", fetchMock);
+  return fetchMock;
+};
+
+const calledLineupEndpoint = (fetchMock: FetchMock) =>
+  fetchMock.mock.calls.some(([input]) => {
+    const url = typeof input === "string" ? input : input.url;
+    return url.includes("/api/lineup/generate");
+  });
+
 describe("Home", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
   });
 
-  it("renders the lineup form", () => {
+  it("renders the lineup form", async () => {
+    const fetchMock = stubFetch();
     render(<Home />);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
 
     expect(
       screen.getByRole("heading", {
@@ -62,8 +98,7 @@ describe("Home", () => {
   });
 
   it("shows validation when budget is invalid", async () => {
-    const fetchMock = vi.fn();
-    vi.stubGlobal("fetch", fetchMock);
+    const fetchMock = stubFetch();
 
     render(<Home />);
 
@@ -73,19 +108,19 @@ describe("Home", () => {
     fireEvent.click(screen.getByRole("button", { name: /Gerar time/i }));
 
     expect(await screen.findByText(/maior que zero/i)).toBeInTheDocument();
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(calledLineupEndpoint(fetchMock)).toBe(false);
   });
 
-  it("shows loading state while requesting lineup", () => {
-    const fetchMock = vi.fn(
+  it("shows loading state while requesting lineup", async () => {
+    const fetchMock = stubFetch(
       () =>
         new Promise<Response>(() => {
           return undefined;
         }),
     );
-    vi.stubGlobal("fetch", fetchMock);
 
     render(<Home />);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
 
     fireEvent.click(screen.getByRole("button", { name: /Gerar time/i }));
 
@@ -94,12 +129,13 @@ describe("Home", () => {
   });
 
   it("renders the generated lineup on success", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => successPayload,
-    });
-    vi.stubGlobal("fetch", fetchMock);
+    const fetchMock = stubFetch(() =>
+      Promise.resolve({
+        ok: true,
+        status: 200,
+        json: async () => successPayload,
+      }),
+    );
 
     render(<Home />);
 
@@ -115,12 +151,13 @@ describe("Home", () => {
   });
 
   it("opens and closes the player analysis modal", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => successPayload,
-    });
-    vi.stubGlobal("fetch", fetchMock);
+    const fetchMock = stubFetch(() =>
+      Promise.resolve({
+        ok: true,
+        status: 200,
+        json: async () => successPayload,
+      }),
+    );
 
     render(<Home />);
 
@@ -152,12 +189,13 @@ describe("Home", () => {
       },
     };
 
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => payloadWithUnknownClub,
-    });
-    vi.stubGlobal("fetch", fetchMock);
+    const fetchMock = stubFetch(() =>
+      Promise.resolve({
+        ok: true,
+        status: 200,
+        json: async () => payloadWithUnknownClub,
+      }),
+    );
 
     render(<Home />);
 
@@ -168,18 +206,19 @@ describe("Home", () => {
   });
 
   it("renders functional errors from the API", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: false,
-      status: 422,
-      json: async () => ({
-        error: {
-          code: "LINEUP_NOT_POSSIBLE",
-          message: "Nao foi possivel montar um time valido com esse orcamento e formacao.",
-        },
-        warnings: ["clubs: missing data for club 20"],
+    const fetchMock = stubFetch(() =>
+      Promise.resolve({
+        ok: false,
+        status: 422,
+        json: async () => ({
+          error: {
+            code: "LINEUP_NOT_POSSIBLE",
+            message: "Nao foi possivel montar um time valido com esse orcamento e formacao.",
+          },
+          warnings: ["clubs: missing data for club 20"],
+        }),
       }),
-    });
-    vi.stubGlobal("fetch", fetchMock);
+    );
 
     render(<Home />);
 
@@ -195,25 +234,34 @@ describe("Home", () => {
   });
 
   it("renders a technical error and allows retry", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce({
-        ok: false,
-        status: 503,
-        json: async () => ({
-          error: {
-            code: "UPSTREAM_UNAVAILABLE",
-            message: "Nao foi possivel gerar o time agora. Tente novamente em instantes.",
-          },
-          warnings: [],
-        }),
-      })
-      .mockResolvedValueOnce({
+    let lineupAttempts = 0;
+    const fetchMock = stubFetch((input) => {
+      const url = typeof input === "string" ? input : input.url;
+      if (!url.includes("/api/lineup/generate")) {
+        return Promise.reject(new Error(`Unexpected fetch to ${url}`));
+      }
+
+      lineupAttempts += 1;
+      if (lineupAttempts === 1) {
+        return Promise.resolve({
+          ok: false,
+          status: 503,
+          json: async () => ({
+            error: {
+              code: "UPSTREAM_UNAVAILABLE",
+              message: "Nao foi possivel gerar o time agora. Tente novamente em instantes.",
+            },
+            warnings: [],
+          }),
+        });
+      }
+
+      return Promise.resolve({
         ok: true,
         status: 200,
         json: async () => successPayload,
       });
-    vi.stubGlobal("fetch", fetchMock);
+    });
 
     render(<Home />);
 

@@ -15,11 +15,23 @@ import {
 } from "@/lib/domain/types";
 import { getClubCardTint } from "@/lib/ui/club-colors";
 import useEmblaCarousel from "embla-carousel-react";
-import { CSSProperties, FormEvent, useEffect, useMemo, useState } from "react";
+import {
+  CSSProperties,
+  FormEvent,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 type FieldErrors = {
   budget?: string;
   formation?: string;
+};
+
+type RoundStatus = {
+  marketRound: number;
+  marketStatus: GenerateLineupResponse["marketStatus"];
 };
 
 type ViewState =
@@ -66,6 +78,18 @@ const MARKET_STATUS_LABELS: Record<GenerateLineupResponse["marketStatus"], strin
   closed: "Mercado fechado",
   maintenance: "Em manutencao",
   paused: "Mercado pausado",
+};
+
+const isMarketStatus = (value: unknown): value is RoundStatus["marketStatus"] =>
+  typeof value === "string" && value in MARKET_STATUS_LABELS;
+
+const isRoundStatusPayload = (value: unknown): value is RoundStatus => {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Record<string, unknown>;
+  return typeof candidate.marketRound === "number" && isMarketStatus(candidate.marketStatus);
 };
 
 const TECHNICAL_ERROR_MESSAGE =
@@ -264,7 +288,7 @@ function SummaryCard({
   accent = "default",
 }: {
   title: string;
-  value: string;
+  value: ReactNode;
   subtitle: string;
   accent?: "default" | "purple" | "green";
 }) {
@@ -288,6 +312,15 @@ function SummaryCard({
         {subtitle}
       </span>
     </article>
+  );
+}
+
+function RoundLoadingIcon() {
+  return (
+    <span
+      className="inline-flex h-5 w-5 animate-spin rounded-full border border-white/30 border-t-white"
+      aria-hidden="true"
+    />
   );
 }
 
@@ -1027,15 +1060,64 @@ export function LineupGenerator() {
   const [viewState, setViewState] = useState<ViewState>({ status: "idle" });
   const [selectedPlayer, setSelectedPlayer] = useState<ScoredPlayer | null>(null);
   const [selectedCoach, setSelectedCoach] = useState<ScoredCoach | null>(null);
+  const [roundStatus, setRoundStatus] = useState<RoundStatus | null>(null);
+  const [roundStatusLoading, setRoundStatusLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadRoundStatus = async () => {
+      try {
+        const response = await fetch("/api/lineup/status");
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = await response.json();
+        if (isRoundStatusPayload(payload) && isMounted) {
+          setRoundStatus(payload);
+        }
+      } catch {
+        // swallow failures; show fallback once loading flag resets
+      } finally {
+        if (isMounted) {
+          setRoundStatusLoading(false);
+        }
+      }
+    };
+
+    loadRoundStatus();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const selectedPlayersCount =
     viewState.status === "success" ? viewState.data.lineup.players.length : 0;
 
-  const activeRound = viewState.status === "success" ? String(viewState.data.marketRound) : "28";
+  const roundValueString =
+    viewState.status === "success"
+      ? String(viewState.data.marketRound)
+      : roundStatus
+      ? String(roundStatus.marketRound)
+      : null;
+  const shouldShowRoundSpinner = !roundValueString && roundStatusLoading;
+  const roundValueNode = shouldShowRoundSpinner ? (
+    <>
+      <RoundLoadingIcon />
+      <span className="sr-only">Carregando rodada</span>
+    </>
+  ) : (
+    roundValueString ?? "—"
+  );
+  const fallbackStatusLabel = roundStatusLoading ? "Carregando status" : "Status indisponivel";
+
   const activeMarketStatus =
     viewState.status === "success"
       ? MARKET_STATUS_LABELS[viewState.data.marketStatus]
-      : "Mercado aberto";
+      : roundStatus
+      ? MARKET_STATUS_LABELS[roundStatus.marketStatus]
+      : fallbackStatusLabel;
 
   const validate = (): { budget?: number; errors: FieldErrors } => {
     const nextErrors: FieldErrors = {};
@@ -1120,7 +1202,9 @@ export function LineupGenerator() {
               <span className="block text-[11px] uppercase tracking-[0.12em] text-[color:var(--color-brand-secondary)]">
                 rodada
               </span>
-              <strong className="font-[var(--font-display)] text-[18px]">{activeRound}</strong>
+              <strong className="font-[var(--font-display)] text-[18px]">
+                {roundValueNode}
+              </strong>
             </div>
           </header>
 
@@ -1150,7 +1234,7 @@ export function LineupGenerator() {
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
                 <SummaryCard
                   title="Rodada"
-                  value={activeRound}
+                  value={roundValueNode}
                   subtitle={activeMarketStatus}
                   accent="purple"
                 />
