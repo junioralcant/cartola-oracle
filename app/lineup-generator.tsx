@@ -1243,14 +1243,14 @@ export function LineupGenerator() {
                   value={
                     viewState.status === "success"
                       ? formatScore(viewState.data.summary.totalScore)
-                      : "82.4"
+                      : formatScore(0)
                   }
                   subtitle={
                     viewState.status === "success"
                       ? `Valor medio C$ ${formatCurrency(
                           viewState.data.summary.totalCost / Math.max(selectedPlayersCount, 1),
                         )}`
-                      : "Valor medio C$ 11.1"
+                      : `Valor medio C$ ${formatCurrency(0)}`
                   }
                 />
               </div>
