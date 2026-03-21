@@ -1383,19 +1383,6 @@ export function LineupGenerator() {
                 </div>
               </section>
 
-              <section className={cx(surfaceCardClass, "grid gap-4 p-6")}>
-                <div>
-                  <p className={eyebrowClass}>Fluxo</p>
-                  <h2 className="m-0 font-[var(--font-display)] text-[28px] leading-[1.15]">
-                    Home, resultado e modal no mesmo fluxo
-                  </h2>
-                </div>
-                <ol className="m-0 grid gap-3 pl-5 text-[14px] leading-6 text-[color:var(--color-text-secondary)]">
-                  <li>Defina orcamento e formacao.</li>
-                  <li>Gere o melhor time com leitura de rodada.</li>
-                  <li>Abra qualquer atleta para detalhes analiticos.</li>
-                </ol>
-              </section>
             </section>
           )}
         </div>
