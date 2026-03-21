@@ -29,13 +29,6 @@ type ViewState =
   | { status: "functional-error"; error: GenerateLineupError; warnings: string[] }
   | { status: "technical-error"; message: string };
 
-type GroupedPlayers = {
-  position: Position;
-  label: string;
-  shortLabel: string;
-  players: ScoredPlayer[];
-};
-
 type PitchPlayer = {
   player: ScoredPlayer;
   top: string;
@@ -124,14 +117,6 @@ const isLineupErrorResponse = (value: unknown): value is LineupErrorResponse => 
     Array.isArray(candidate.warnings)
   );
 };
-
-const groupPlayers = (players: ScoredPlayer[]): GroupedPlayers[] =>
-  POSITION_ORDER.map((position) => ({
-    position,
-    label: POSITION_LABELS[position],
-    shortLabel: POSITION_SHORT_LABELS[position],
-    players: players.filter((player) => player.position === position),
-  })).filter((group) => group.players.length > 0);
 
 const getFieldPositions = (count: number): string[] => FIELD_X_POSITIONS[count] ?? FIELD_X_POSITIONS[5];
 
@@ -572,40 +557,6 @@ function PlayerCardButton({
   );
 }
 
-function HorizontalPlayerTrack({
-  group,
-  onSelectPlayer,
-}: {
-  group: GroupedPlayers;
-  onSelectPlayer: (player: ScoredPlayer) => void;
-}) {
-  const [emblaRef] = useEmblaCarousel({
-    axis: "x",
-    align: "start",
-    dragFree: true,
-    skipSnaps: true,
-    containScroll: false,
-  });
-
-  return (
-    <div
-      ref={emblaRef}
-      className="overflow-hidden [touch-action:pan-y]"
-      data-testid={`player-track-${group.position}`}
-      data-carousel-lib="embla"
-      aria-label={`Lista horizontal de ${group.label}`}
-    >
-      <div className="flex gap-3 overflow-y-hidden pb-2 pr-1 [scrollbar-width:thin] [-webkit-overflow-scrolling:touch] [overscroll-behavior-x:contain]">
-        {group.players.map((player) => (
-          <div key={player.id} className="min-w-[16rem] shrink-0 basis-[min(82vw,18rem)]">
-            <PlayerCardButton player={player} onSelect={onSelectPlayer} compact />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function PitchPlayerIcon({
   player,
   top,
@@ -819,84 +770,6 @@ function TacticalPitch({
         })}
         <CoachOnFieldBadge coach={coach} onSelect={onSelectCoach} />
       </div>
-    </section>
-  );
-}
-
-function CoachHighlight({ coach }: { coach: ScoredCoach }) {
-  return (
-    <article className={cx(surfaceCardClass, "grid gap-4 p-6")}>
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className={eyebrowClass}>Tecnico</p>
-          <h2 className="m-0 font-[var(--font-display)] text-[28px] leading-[1.15]">
-            Tecnico em destaque
-          </h2>
-        </div>
-        <ClubBadge abbreviation={coach.clubAbbreviation} shieldUrl={coach.clubShieldUrl} />
-      </div>
-      <div className={cx(panelClass, "grid gap-3 p-5")}>
-        <div>
-          <span className="text-[12px] uppercase tracking-[0.12em] text-[color:var(--color-text-tertiary)]">
-            {coach.clubAbbreviation}
-          </span>
-          <h3 className="mt-2 mb-0 font-[var(--font-display)] text-[24px] leading-[1.15]">{coach.name}</h3>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <span className="text-[12px] uppercase tracking-[0.12em] text-[color:var(--color-text-tertiary)]">
-              custo
-            </span>
-            <strong className="mt-1 block text-[16px]">C$ {formatCurrency(coach.price)}</strong>
-          </div>
-          <div>
-            <span className="text-[12px] uppercase tracking-[0.12em] text-[color:var(--color-text-tertiary)]">
-              projecao
-            </span>
-            <strong className="mt-1 block text-[16px]">{formatScore(coach.score)}</strong>
-          </div>
-        </div>
-        <p className="m-0 text-[14px] leading-6 text-[color:var(--color-text-secondary)]">
-          {coach.justification}
-        </p>
-      </div>
-    </article>
-  );
-}
-
-function InsightList({
-  title,
-  eyebrow,
-  items,
-  accent = "default",
-}: {
-  title: string;
-  eyebrow: string;
-  items: string[];
-  accent?: "default" | "warning";
-}) {
-  if (items.length === 0) {
-    return null;
-  }
-
-  return (
-    <section
-      className={cx(
-        surfaceCardClass,
-        "grid gap-4 p-6",
-        accent === "warning" &&
-          "[background:linear-gradient(180deg,rgba(255,207,102,0.12),transparent_32%),rgba(255,255,255,0.05)]",
-      )}
-    >
-      <div>
-        <p className={eyebrowClass}>{eyebrow}</p>
-        <h2 className="m-0 font-[var(--font-display)] text-[28px] leading-[1.15]">{title}</h2>
-      </div>
-      <ul className="m-0 list-disc pl-[1.1rem] text-[14px] leading-6 text-[color:var(--color-text-secondary)]">
-        {items.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
     </section>
   );
 }
@@ -1154,12 +1027,6 @@ export function LineupGenerator() {
   const [viewState, setViewState] = useState<ViewState>({ status: "idle" });
   const [selectedPlayer, setSelectedPlayer] = useState<ScoredPlayer | null>(null);
   const [selectedCoach, setSelectedCoach] = useState<ScoredCoach | null>(null);
-
-  const groupedPlayers = useMemo(
-    () =>
-      viewState.status === "success" ? groupPlayers(viewState.data.lineup.players) : [],
-    [viewState],
-  );
 
   const selectedPlayersCount =
     viewState.status === "success" ? viewState.data.lineup.players.length : 0;
@@ -1431,7 +1298,7 @@ export function LineupGenerator() {
                   </div>
 
                   <div className="grid gap-3">
-                    {viewState.data.lineup.players.slice(0, 6).map((player) => (
+                    {viewState.data.lineup.players.map((player) => (
                       <button
                         key={player.id}
                         type="button"
@@ -1439,66 +1306,51 @@ export function LineupGenerator() {
                         onClick={() => setSelectedPlayer(player)}
                         aria-label={`Abrir analise de ${player.name}`}
                       >
-                        <div>
-                          <span className="text-[12px] uppercase tracking-[0.12em] text-[color:var(--color-text-tertiary)]">
-                            {POSITION_SHORT_LABELS[player.position]}
-                          </span>
-                          <strong className="mt-1 block text-[16px]">{player.name}</strong>
+                        <div className="flex items-center gap-3">
+                          <ClubBadge
+                            abbreviation={player.clubAbbreviation}
+                            shieldUrl={player.clubShieldUrl}
+                            size="h-10 w-10"
+                          />
+                          <div>
+                            <span className="text-[12px] uppercase tracking-[0.12em] text-[color:var(--color-text-tertiary)]">
+                              {POSITION_SHORT_LABELS[player.position]}
+                            </span>
+                            <strong className="mt-1 block text-[16px]">{player.name}</strong>
+                          </div>
                         </div>
                         <span className="text-[14px] font-bold text-[color:var(--color-warning)]">
                           {formatScore(player.score)} pts
                         </span>
                       </button>
                     ))}
+                    <button
+                      type="button"
+                      className={cx(panelClass, "flex items-center justify-between gap-3 p-4 text-left transition hover:bg-white/[0.09]")}
+                      onClick={() => setSelectedCoach(viewState.data.lineup.coach)}
+                      aria-label={`Abrir analise do tecnico ${viewState.data.lineup.coach.name}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <ClubBadge
+                          abbreviation={viewState.data.lineup.coach.clubAbbreviation}
+                          shieldUrl={viewState.data.lineup.coach.clubShieldUrl}
+                          size="h-11 w-11"
+                        />
+                        <div>
+                          <span className="text-[12px] uppercase tracking-[0.12em] text-[color:var(--color-text-tertiary)]">
+                            Tecnico
+                          </span>
+                          <strong className="mt-1 block text-[16px]">{viewState.data.lineup.coach.name}</strong>
+                        </div>
+                      </div>
+                      <span className="text-[14px] font-bold text-[color:var(--color-warning)]">
+                        {formatScore(viewState.data.lineup.coach.score)} pts
+                      </span>
+                    </button>
                   </div>
                 </section>
               </div>
 
-              <section className={cx(surfaceCardClass, "grid gap-5 p-6")}>
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className={eyebrowClass}>Lista expandida</p>
-                    <h2 className="m-0 font-[var(--font-display)] text-[28px] leading-[1.15]">
-                      {selectedPlayersCount} jogadores escalados
-                    </h2>
-                  </div>
-                  <span className="text-[13px] text-[color:var(--color-text-secondary)]">
-                    toque para abrir
-                  </span>
-                </div>
-
-                <div className="grid gap-4">
-                  {groupedPlayers.map((group) => (
-                    <section key={group.position} className={cx(panelClass, "grid gap-3 p-4 sm:p-5")}>
-                      <div className="flex items-center justify-between gap-3">
-                        <h3 className="m-0 font-[var(--font-display)] text-[22px] leading-[1.1]">
-                          {group.label}
-                        </h3>
-                        <span className="text-[13px] text-[color:var(--color-text-secondary)]">
-                          {group.players.length} selecionados
-                        </span>
-                      </div>
-                      <HorizontalPlayerTrack group={group} onSelectPlayer={setSelectedPlayer} />
-                    </section>
-                  ))}
-                </div>
-              </section>
-
-              <div className="grid gap-4 lg:grid-cols-2">
-                <CoachHighlight coach={viewState.data.lineup.coach} />
-                <InsightList
-                  title="Justificativas gerais"
-                  eyebrow="Oracle read"
-                  items={viewState.data.explanations}
-                />
-              </div>
-
-              <InsightList
-                title="Warnings"
-                eyebrow="Alerts"
-                items={viewState.data.warnings}
-                accent="warning"
-              />
             </section>
           ) : (
             <section className="grid gap-4 lg:grid-cols-2">
