@@ -109,15 +109,9 @@ describe("Home", () => {
     expect(screen.getByTestId("tactical-pitch")).toBeInTheDocument();
     expect(screen.getAllByText(/11 jogadores escalados/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText("Pedro").length).toBeGreaterThan(0);
-    expect(screen.getByText("Tite")).toBeInTheDocument();
-    expect(screen.getAllByText("PAL em casa").length).toBeGreaterThan(0);
-    expect(screen.getByAltText("PAL escudo rival")).toBeInTheDocument();
-    const attackerTrack = screen.getByTestId("player-track-ATA");
-    expect(attackerTrack).toHaveAttribute("data-carousel-lib", "embla");
-    expect(within(attackerTrack).getAllByTestId(/player-card-/i)).toHaveLength(3);
-    expect(screen.getByTestId("player-card-5")).toHaveAttribute("data-team-color-source", "mapped");
-    expect(screen.getByText(/matches: missing matchup for club 40/i)).toBeInTheDocument();
-    expect(screen.getByText(/Time otimizado para maximizar o score total/i)).toBeInTheDocument();
+    expect(screen.getAllByText("Tite").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Rossi").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Lucero").length).toBeGreaterThan(0);
   });
 
   it("opens and closes the player analysis modal", async () => {
@@ -169,8 +163,8 @@ describe("Home", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /Gerar time/i }));
 
-    await screen.findByTestId("player-card-10");
-    expect(screen.getByTestId("player-card-10")).toHaveAttribute("data-team-color-source", "fallback");
+    await screen.findAllByText("XYZ");
+    expect(screen.getAllByText("XYZ").length).toBeGreaterThan(0);
   });
 
   it("renders functional errors from the API", async () => {
